@@ -43,7 +43,7 @@ MainFrame::MainFrame(const wxString &title, const wxPoint &pos, const wxSize &si
 	wxImageHandler *TIFFHandler = new wxTIFFHandler();
     wxImage::AddHandler(TIFFHandler);
 	
-	BildMaske.LoadFile(".\\img\\Buchstaben.tiff", wxBITMAP_TYPE_TIFF);
+	BildMaske.LoadFile("./img/Buchstaben.tiff", wxBITMAP_TYPE_TIFF);
 
     CreateStatusBar(2);
     SetStatusText(_("Hello World!"));

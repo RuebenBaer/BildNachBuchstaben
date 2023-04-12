@@ -28,7 +28,7 @@ void BildZerlegen(unsigned char* urBild, int urBildBreite, int urBildHoehe, unsi
 			Gesamtabstand = std::numeric_limits<float>::max();
 			for(int bstbNr = 0; bstbNr < anzBuchstaben; bstbNr++)
 			{
-				aktAbstand = urX = urY = urZ = maskeX = maskeY = maskeZ = 1;
+				aktAbstand = urX = urY = urZ = maskeX = maskeY = maskeZ = 0;
 				for(int x_innen = 0; x_innen < zeichenBreite; x_innen++)
 				{
 					for(int y_innen = 0; y_innen < buchstabenHoehe; y_innen++)
@@ -36,12 +36,11 @@ void BildZerlegen(unsigned char* urBild, int urBildBreite, int urBildHoehe, unsi
 						int urIndex = ((x_aussen * zeichenBreite + x_innen) + (y_aussen * buchstabenHoehe + y_innen) * urBildBreite) * 3;
 						int bstIndex = ((x_innen + bstbNr * zeichenBreite)  + y_innen * buchstabenBreite) * 3;
 						
-						urX *= 1 + pow((urBild[urIndex] - buchstaben[bstIndex])/255.0f, 2);
-						urY *= 1 + pow((urBild[urIndex + 1] - buchstaben[bstIndex + 1])/255.0f, 2);
-						urZ *= 1 + pow((urBild[urIndex + 2] - buchstaben[bstIndex + 2])/255.0f, 2);
+						urX += urBild[urIndex]*0.299f + urBild[urIndex + 1]*0.587f + urBild[urIndex + 2]*0.114f;
+						maskeX += buchstaben[bstIndex]*0.299f + buchstaben[bstIndex + 1]*0.587f + buchstaben[bstIndex + 2]*0.114f;
 					}
 				}
-				aktAbstand = urX * urY * urZ;
+				aktAbstand = abs(urX - maskeX);
 				if(aktAbstand < Gesamtabstand)
 				{
 					Zerlegung[x_aussen + y_aussen * maxX] = bstbNr;
