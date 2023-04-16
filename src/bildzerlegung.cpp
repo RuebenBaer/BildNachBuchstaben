@@ -1,7 +1,5 @@
-#include <cmath>
-#include <iostream>
-#include <iomanip>
-#include <limits>
+#include "bildzerlegung.h"
+
 
 void BildZerlegen(unsigned char* urBild, int urBildBreite, int urBildHoehe, unsigned char* buchstaben, int buchstabenBreite, int buchstabenHoehe, int zeichenBreite) 
 {
@@ -60,4 +58,44 @@ void BildZerlegen(unsigned char* urBild, int urBildBreite, int urBildHoehe, unsi
 		std::cout<<"\n";
 	}
 	return;
+}
+
+NormalVerteilung::Parameter NormalVerteilung::Analyse(unsigned char* rgb_Bild, int bildBreite, int bildHoehe)
+{
+	double mw, var;
+	mw = 0;
+	for(int b = 0; b < bildBreite; b++)
+	{
+		for(int h = 0; h < bildHoehe; h++)
+		{
+			mw += rgb_Bild[b + h * bildBreite];
+			mw += rgb_Bild[b + h * bildBreite + 1];
+			mw += rgb_Bild[b + h * bildBreite + 2];
+		}
+	}
+	mw /= (bildBreite * bildHoehe * 3);
+	
+	var = 0;
+	for(int b = 0; b < bildBreite; b++)
+	{
+		for(int h = 0; h < bildHoehe; h++)
+		{
+			var += pow(mw - rgb_Bild[b + h * bildBreite], 2);
+			var += pow(mw - rgb_Bild[b + h * bildBreite + 1], 2);
+			var += pow(mw - rgb_Bild[b + h * bildBreite + 2], 2);
+		}
+	}
+	var /= (bildBreite * bildHoehe * 3 - 1);
+	
+	Parameter par;
+	par.mittelwert = mw;
+	par.varianz = var;
+	
+	return par;
+}
+
+double NormalVerteilung::Uebereinstimmung(Parameter verteilung1, Parameter verteilung2)
+{
+	double rueckgabe = 0;
+	return rueckgabe;
 }
