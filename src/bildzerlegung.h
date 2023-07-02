@@ -8,6 +8,7 @@
 
 
 void BildZerlegen(unsigned char* urBild, int urBildBreite, int urBildHoehe, unsigned char* buchstaben, int buchstabenBreite, int buchstabenHoehe, int zeichenBreite);
+void BildZerlegenNormalverteilung(unsigned char* urBild, int urBildBreite, int urBildHoehe, unsigned char* buchstaben, int buchstabenBreite, int buchstabenHoehe, int zeichenBreite);
 
 namespace NormalVerteilung
 {
@@ -16,7 +17,7 @@ namespace NormalVerteilung
 		double varianz;
 	};
 	
-	Parameter Analyse(unsigned char* rgb_Bild, int bildBreite, int bildHoehe);
+	Parameter Analyse(int* einKanalBild, int bildBreite, int bildHoehe);
 	double Uebereinstimmung(Parameter verteilung1, Parameter verteilung2);
 }
 

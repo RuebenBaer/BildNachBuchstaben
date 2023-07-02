@@ -5,7 +5,7 @@
 
 #include "base.h"
 
-void BildZerlegen(unsigned char* urBild, int urBildBreite, int urBildHoehe, unsigned char* buchstaben, int buchstabenBreite, int buchstabenHoehe, int zeichenBreite);
+//void BildZerlegen(unsigned char* urBild, int urBildBreite, int urBildHoehe, unsigned char* buchstaben, int buchstabenBreite, int buchstabenHoehe, int zeichenBreite);
 
 IMPLEMENT_APP(MainApp)
 
@@ -43,7 +43,7 @@ MainFrame::MainFrame(const wxString &title, const wxPoint &pos, const wxSize &si
 	wxImageHandler *TIFFHandler = new wxTIFFHandler();
     wxImage::AddHandler(TIFFHandler);
 	
-	BildMaske.LoadFile("/img/Buchstaben.tiff", wxBITMAP_TYPE_TIFF);
+	BildMaske.LoadFile("./img/Buchstaben.tiff", wxBITMAP_TYPE_TIFF);
 
     CreateStatusBar(2);
     SetStatusText(_("Hello World!"));
@@ -69,6 +69,7 @@ void MainFrame::OnOpenBild(wxCommandEvent &event)
 	unsigned char *buchstabenDaten = BildMaske.GetData();
 	
 	BildZerlegen(urDaten, WandelBild.GetWidth(), WandelBild.GetHeight(), buchstabenDaten, BildMaske.GetWidth(), BildMaske.GetHeight(),  BildMaske.GetWidth()/95);
+	BildZerlegenNormalverteilung(urDaten, WandelBild.GetWidth(), WandelBild.GetHeight(), buchstabenDaten, BildMaske.GetWidth(), BildMaske.GetHeight(),  BildMaske.GetWidth()/95);
 
 	Refresh();
 	return;

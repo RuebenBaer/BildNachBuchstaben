@@ -1,6 +1,8 @@
 #ifndef __BASE_H
 #define __BASE_H
 
+#include "bildzerlegung.h"
+
 class MainApp: public wxApp
 {
   public:
