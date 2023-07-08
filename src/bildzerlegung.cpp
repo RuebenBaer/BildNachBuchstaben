@@ -157,3 +157,38 @@ double NormalVerteilung::Uebereinstimmung(Parameter verteilung1, Parameter verte
 	double rueckgabe = 0;
 	return rueckgabe;
 }
+
+void BildZerlegenSchwerpunkt(unsigned char* urBild, int urBildBreite, int urBildHoehe, unsigned char* buchstaben, int buchstabenBreite, int buchstabenHoehe, int zeichenBreite)
+{
+	int maxX = urBildBreite / zeichenBreite;
+	int maxY = urBildHoehe / buchstabenHoehe;
+	
+	std::cout<<"zeichenBreite = "<<zeichenBreite<<'\n';
+	std::cout<<"maxX / maxY : "<<maxX<<" / "<<maxY<<'\n';
+	
+	int Zerlegung[maxX * maxY];
+	
+	int anzBuchstaben = buchstabenBreite / zeichenBreite;
+	double *BuchstabenSchwerpunkt = new double[3 * anzBuchstaben];
+	
+	int* einKanalBild = new int[zeichenBreite * buchstabenHoehe];
+	
+	for(int x_aussen = 0; x_aussen < maxX; x_aussen++)
+	{
+		for(int y_aussen = 0; y_aussen < maxY; y_aussen++)
+		{
+			GesamtStreuung = 0;//std::numeric_limits<float>::max();
+			for(int bstbNr = 0; bstbNr < anzBuchstaben; bstbNr++)
+			{
+				aktStreuung = 0;
+				for(int x_innen = 0; x_innen < zeichenBreite; x_innen++)
+				{
+					for(int y_innen = 0; y_innen < buchstabenHoehe; y_innen++)
+					{
+					}
+				}
+			}
+		}
+	}
+	return;
+}

@@ -21,5 +21,5 @@ namespace NormalVerteilung
 	double Uebereinstimmung(Parameter verteilung1, Parameter verteilung2);
 }
 
-
+void BildZerlegenSchwerpunkt(unsigned char* urBild, int urBildBreite, int urBildHoehe, unsigned char* buchstaben, int buchstabenBreite, int buchstabenHoehe, int zeichenBreite);
 #endif //__BILDZERLEGUNG_H
