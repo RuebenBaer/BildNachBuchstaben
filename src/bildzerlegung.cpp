@@ -105,9 +105,7 @@ void BildZerlegenNormalverteilung(unsigned char* urBild, int urBildBreite, int u
 					GesamtStreuung = aktStreuung;
 				}
 			}
-			std::cout<<(int)Zerlegung[x_aussen + y_aussen * maxX]<<"("<<GesamtStreuung<<")";
 		}
-		std::cout<<"\n";
 	}
 	
 	std::cout<<"Bildausgabe\n\n";
@@ -166,21 +164,17 @@ void BildZerlegenSchwerpunkt(unsigned char* urBild, int urBildBreite, int urBild
 	std::cout<<"zeichenBreite = "<<zeichenBreite<<'\n';
 	std::cout<<"maxX / maxY : "<<maxX<<" / "<<maxY<<'\n';
 	
-	int Zerlegung[maxX * maxY];
+	//int Zerlegung[maxX * maxY];
 	
 	int anzBuchstaben = buchstabenBreite / zeichenBreite;
-	double *BuchstabenSchwerpunkt = new double[3 * anzBuchstaben];
-	
-	int* einKanalBild = new int[zeichenBreite * buchstabenHoehe];
 	
 	for(int x_aussen = 0; x_aussen < maxX; x_aussen++)
 	{
 		for(int y_aussen = 0; y_aussen < maxY; y_aussen++)
 		{
-			GesamtStreuung = 0;//std::numeric_limits<float>::max();
+			//std::numeric_limits<float>::max();
 			for(int bstbNr = 0; bstbNr < anzBuchstaben; bstbNr++)
 			{
-				aktStreuung = 0;
 				for(int x_innen = 0; x_innen < zeichenBreite; x_innen++)
 				{
 					for(int y_innen = 0; y_innen < buchstabenHoehe; y_innen++)
@@ -188,6 +182,41 @@ void BildZerlegenSchwerpunkt(unsigned char* urBild, int urBildBreite, int urBild
 					}
 				}
 			}
+		}
+	}
+	return;
+}
+
+void SchwerpunktBild(unsigned char *Bild, int iBreite, int iHoehe, double dFarbHoehenFkt, schwerPunkt& swPkt)
+{
+	double dGesamtFarbHoehe[3];
+	for(int achse = 0; achse < 3; achse++)
+	{
+		swPkt.wert[0][achse] = 0;
+		swPkt.wert[1][achse] = 0;
+		swPkt.wert[2][achse] = 0;
+		dGesamtFarbHoehe[achse] = 0;
+	}
+	int iStelle;
+	for(int x = 0; x < iBreite; x++)
+	{
+		for(int y = 0; y < iHoehe; y++)
+		{
+			iStelle = (x + y * iBreite) * 3;
+			for(int rgb = 0; rgb < 3; rgb++)
+			{
+				dGesamtFarbHoehe[rgb] += Bild[iStelle + rgb];
+				swPkt.wert[rgb][0] += Bild[iStelle + rgb] * x;
+				swPkt.wert[rgb][1] += Bild[iStelle + rgb] * y;
+				swPkt.wert[rgb][2] += Bild[iStelle + rgb] * Bild[iStelle + rgb] * dFarbHoehenFkt;
+			}
+		}
+	}
+	for(int rgb = 0; rgb < 3; rgb++)
+	{
+		for(int achse = 0; achse < 3; achse++)
+		{
+			swPkt.wert[rgb][achse] /= dGesamtFarbHoehe[rgb];
 		}
 	}
 	return;
