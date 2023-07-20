@@ -44,6 +44,8 @@ MainFrame::MainFrame(const wxString &title, const wxPoint &pos, const wxSize &si
     wxImage::AddHandler(TIFFHandler);
 	
 	BildMaske.LoadFile("./img/Buchstaben.tiff", wxBITMAP_TYPE_TIFF);
+	unsigned char *buchstabenDaten = BildMaske.GetData();
+	BildZerlegenSchwerpunkt(NULL, 0, 0, buchstabenDaten, BildMaske.GetWidth(), BildMaske.GetHeight(), BildMaske.GetWidth()/95);
 
     CreateStatusBar(2);
     SetStatusText(_("Hello World!"));
@@ -68,7 +70,7 @@ void MainFrame::OnOpenBild(wxCommandEvent &event)
 	unsigned char *urDaten = WandelBild.GetData();
 	unsigned char *buchstabenDaten = BildMaske.GetData();
 	
-	BildZerlegen(urDaten, WandelBild.GetWidth(), WandelBild.GetHeight(), buchstabenDaten, BildMaske.GetWidth(), BildMaske.GetHeight(),  BildMaske.GetWidth()/95);
+	BildZerlegen(urDaten, WandelBild.GetWidth(), WandelBild.GetHeight(), buchstabenDaten, BildMaske.GetWidth(), BildMaske.GetHeight(), BildMaske.GetWidth()/95);
 	BildZerlegenNormalverteilung(urDaten, WandelBild.GetWidth(), WandelBild.GetHeight(), buchstabenDaten, BildMaske.GetWidth(), BildMaske.GetHeight(),  BildMaske.GetWidth()/95);
 
 	Refresh();

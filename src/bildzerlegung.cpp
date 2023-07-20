@@ -158,32 +158,33 @@ double NormalVerteilung::Uebereinstimmung(Parameter verteilung1, Parameter verte
 
 void BildZerlegenSchwerpunkt(unsigned char* urBild, int urBildBreite, int urBildHoehe, unsigned char* buchstaben, int buchstabenBreite, int buchstabenHoehe, int zeichenBreite)
 {
-	int maxX = urBildBreite / zeichenBreite;
-	int maxY = urBildHoehe / buchstabenHoehe;
-	
 	std::cout<<"zeichenBreite = "<<zeichenBreite<<'\n';
-	std::cout<<"maxX / maxY : "<<maxX<<" / "<<maxY<<'\n';
-	
-	//int Zerlegung[maxX * maxY];
-	
+
 	int anzBuchstaben = buchstabenBreite / zeichenBreite;
+	schwerPunkt* buchstabenSP = new schwerPunkt[anzBuchstaben];
+	unsigned char* tempBild = new unsigned char[buchstabenHoehe * zeichenBreite * 3];
 	
-	for(int x_aussen = 0; x_aussen < maxX; x_aussen++)
+	for(int bstNr = 0; bstNr < anzBuchstaben; bstNr++)
 	{
-		for(int y_aussen = 0; y_aussen < maxY; y_aussen++)
+		for(int x = 0; x < zeichenBreite; x++)
 		{
-			//std::numeric_limits<float>::max();
-			for(int bstbNr = 0; bstbNr < anzBuchstaben; bstbNr++)
+			for(int y = 0; y < buchstabenHoehe; y++)
 			{
-				for(int x_innen = 0; x_innen < zeichenBreite; x_innen++)
+				for(int rgb = 0; rgb < 3; rgb++)
 				{
-					for(int y_innen = 0; y_innen < buchstabenHoehe; y_innen++)
-					{
-					}
+					tempBild[(x + y * zeichenBreite) * 3 + rgb] = 
+						buchstaben[(bstNr * zeichenBreite + x + y * buchstabenBreite) * 3 + rgb];
 				}
 			}
 		}
+		std::cout<<(char)(32 + bstNr)<<",";
+		SchwerpunktBild(tempBild, zeichenBreite, buchstabenHoehe, 0.02, buchstabenSP[bstNr]);
 	}
+	
+	
+	delete []buchstabenSP;
+	delete []tempBild;
+	
 	return;
 }
 
@@ -217,7 +218,9 @@ void SchwerpunktBild(unsigned char *Bild, int iBreite, int iHoehe, double dFarbH
 		for(int achse = 0; achse < 3; achse++)
 		{
 			swPkt.wert[rgb][achse] /= dGesamtFarbHoehe[rgb];
+			std::cout<<swPkt.wert[rgb][achse]<<",";
 		}
+		if(rgb == 2)std::cout<<"\n";
 	}
 	return;
 }
