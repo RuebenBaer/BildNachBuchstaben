@@ -6,6 +6,7 @@ void BildZerlegen(unsigned char* urBild, int urBildBreite, int urBildHoehe, unsi
 	int maxX = urBildBreite / zeichenBreite;
 	int maxY = urBildHoehe / buchstabenHoehe;
 	
+	std::cout<<"Zerlegung nach Helligkeit\n";
 	std::cout<<"zeichenBreite = "<<zeichenBreite<<'\n';
 	std::cout<<"maxX / maxY : "<<maxX<<" / "<<maxY<<'\n';
 	
@@ -65,6 +66,7 @@ void BildZerlegenNormalverteilung(unsigned char* urBild, int urBildBreite, int u
 	int maxX = urBildBreite / zeichenBreite;
 	int maxY = urBildHoehe / buchstabenHoehe;
 	
+	std::cout<<"Zerlegung nach Normalverteilung\n";
 	std::cout<<"zeichenBreite = "<<zeichenBreite<<'\n';
 	std::cout<<"maxX / maxY : "<<maxX<<" / "<<maxY<<'\n';
 	
@@ -156,12 +158,20 @@ double NormalVerteilung::Uebereinstimmung(Parameter verteilung1, Parameter verte
 	return rueckgabe;
 }
 
-void BildZerlegenSchwerpunkt(unsigned char* urBild, int urBildBreite, int urBildHoehe, unsigned char* buchstaben, int buchstabenBreite, int buchstabenHoehe, int zeichenBreite)
+void SchwerPunkt::BildZerlegenSchwerpunkt(unsigned char* urBild, int urBildBreite, int urBildHoehe, unsigned char* buchstaben, int buchstabenBreite, int buchstabenHoehe, int zeichenBreite)
 {
+	int maxX = urBildBreite / zeichenBreite;
+	int maxY = urBildHoehe / buchstabenHoehe;
+	
+	std::cout<<"Schwerpunktzerlegung\n";
 	std::cout<<"zeichenBreite = "<<zeichenBreite<<'\n';
-
+	std::cout<<"maxX / maxY : "<<maxX<<" / "<<maxY<<'\n';
+	
+	int Zerlegung[maxX * maxY];
+	
+	double dFarbHoehenFkt = 0.02;
 	int anzBuchstaben = buchstabenBreite / zeichenBreite;
-	schwerPunkt* buchstabenSP = new schwerPunkt[anzBuchstaben];
+	SchwerPunkt::schwerPunkt* buchstabenSP = new SchwerPunkt::schwerPunkt[anzBuchstaben];
 	unsigned char* tempBild = new unsigned char[buchstabenHoehe * zeichenBreite * 3];
 	
 	for(int bstNr = 0; bstNr < anzBuchstaben; bstNr++)
@@ -177,18 +187,40 @@ void BildZerlegenSchwerpunkt(unsigned char* urBild, int urBildBreite, int urBild
 				}
 			}
 		}
-		std::cout<<(char)(32 + bstNr)<<",";
-		SchwerpunktBild(tempBild, zeichenBreite, buchstabenHoehe, 0.02, buchstabenSP[bstNr]);
+		//std::cout<<(char)(32 + bstNr)<<",";
+		SchwerPunkt::SchwerpunktBild(tempBild, zeichenBreite, buchstabenHoehe, dFarbHoehenFkt, buchstabenSP[bstNr]);
 	}
 	
-	
+	SchwerPunkt::schwerPunkt aktBildSP;
+	//Teilbild extrhieren
+	int iStelle;
+	for(int x = 0; x < urBildBreite - zeichenBreite; x += zeichenBreite)
+	{
+		for(int y = 0; y < urBildHoehe - buchstabenHoehe; y += buchstabenHoehe)
+		{
+			for(int b = 0; b < zeichenBreite; b++)
+			{
+				for(int h = 0; h < buchstabenHoehe; h++)
+				{
+					for(int rgb = 0; rgb < 3; rgb++)
+					{
+						iStelle = (x + b + (y + h) * urBildBreite) * 3 + rgb;
+						tempBild[(b + h * zeichenBreite) * 3 + rgb] = urBild[iStelle];
+					}
+				}
+			}
+			SchwerPunkt::SchwerpunktBild(tempBild, zeichenBreite, buchstabenHoehe, dFarbHoehenFkt, aktBildSP);
+			//kleinsten Schwerpunktabstand finden
+		}
+	}
+
 	delete []buchstabenSP;
 	delete []tempBild;
 	
 	return;
 }
 
-void SchwerpunktBild(unsigned char *Bild, int iBreite, int iHoehe, double dFarbHoehenFkt, schwerPunkt& swPkt)
+void SchwerPunkt::SchwerpunktBild(unsigned char *Bild, int iBreite, int iHoehe, double dFarbHoehenFkt, SchwerPunkt::schwerPunkt& swPkt)
 {
 	double dGesamtFarbHoehe[3];
 	for(int achse = 0; achse < 3; achse++)
@@ -218,9 +250,21 @@ void SchwerpunktBild(unsigned char *Bild, int iBreite, int iHoehe, double dFarbH
 		for(int achse = 0; achse < 3; achse++)
 		{
 			swPkt.wert[rgb][achse] /= dGesamtFarbHoehe[rgb];
-			std::cout<<swPkt.wert[rgb][achse]<<",";
+			//std::cout<<swPkt.wert[rgb][achse]<<",";
 		}
-		if(rgb == 2)std::cout<<"\n";
+		//if(rgb == 2)std::cout<<"\n";
 	}
 	return;
+}
+
+int SchwerPunkt::KleinsterSchwerpunktAbstand(SchwerPunkt::schwerPunkt vergleichSP, SchwerPunkt::schwerPunkt* listeSP, int listenLaenge)
+{
+	int kleinsterAbstand = std::numeric_limits<int>::max();
+	int rueckgabeSP = 0;
+	for(int i = 0; i < listenLaenge; i++)
+	{
+		//abstandSchwerpunkte ausrechnen
+		//wenn neuer Abstand kleiner als gespeicherter -> neuen speichern
+	}
+	return rueckgabeSP;
 }

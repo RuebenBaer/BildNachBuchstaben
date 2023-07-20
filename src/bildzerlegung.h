@@ -21,11 +21,14 @@ namespace NormalVerteilung
 	double Uebereinstimmung(Parameter verteilung1, Parameter verteilung2);
 }
 
-void BildZerlegenSchwerpunkt(unsigned char* urBild, int urBildBreite, int urBildHoehe, unsigned char* buchstaben, int buchstabenBreite, int buchstabenHoehe, int zeichenBreite);
+namespace SchwerPunkt
+{
+	typedef struct{
+		double wert[3][3];//[rgb][achse]
+	}schwerPunkt;
 
-typedef struct{
-	double wert[3][3];//[rgb][achse]
-}schwerPunkt;
-
-void SchwerpunktBild(unsigned char *Bild, int iBreite, int iHoehe, double dFarbHoehenFkt, schwerPunkt& swPkt);
+	void BildZerlegenSchwerpunkt(unsigned char* urBild, int urBildBreite, int urBildHoehe, unsigned char* buchstaben, int buchstabenBreite, int buchstabenHoehe, int zeichenBreite);
+	int KleinsterSchwerpunktAbstand(schwerPunkt vergleichSP, schwerPunkt* listeSP, int listenLaenge);
+	void SchwerpunktBild(unsigned char *Bild, int iBreite, int iHoehe, double dFarbHoehenFkt, schwerPunkt& swPkt);
+}
 #endif //__BILDZERLEGUNG_H
