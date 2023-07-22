@@ -101,7 +101,7 @@ void BildZerlegenNormalverteilung(unsigned char* urBild, int urBildBreite, int u
 				}
 				NormalVerteilung::Parameter parm = NormalVerteilung::Analyse(einKanalBild, zeichenBreite, buchstabenHoehe);
 				aktStreuung = parm.varianz;
-				if(aktStreuung > GesamtStreuung)
+				if(aktStreuung < GesamtStreuung)
 				{
 					Zerlegung[x_aussen + y_aussen * maxX] = bstbNr;
 					GesamtStreuung = aktStreuung;
@@ -192,10 +192,12 @@ void SchwerPunkt::BildZerlegenSchwerpunkt(unsigned char* urBild, int urBildBreit
 	}
 	
 	SchwerPunkt::schwerPunkt aktBildSP;
-	//Teilbild extrhieren
+	//Teilbild extrahieren
 	int iStelle;
+	int zerlX = 0;
 	for(int x = 0; x < urBildBreite - zeichenBreite; x += zeichenBreite)
 	{
+		int zerlY = 0;
 		for(int y = 0; y < urBildHoehe - buchstabenHoehe; y += buchstabenHoehe)
 		{
 			for(int b = 0; b < zeichenBreite; b++)
@@ -210,8 +212,20 @@ void SchwerPunkt::BildZerlegenSchwerpunkt(unsigned char* urBild, int urBildBreit
 				}
 			}
 			SchwerPunkt::SchwerpunktBild(tempBild, zeichenBreite, buchstabenHoehe, dFarbHoehenFkt, aktBildSP);
-			//kleinsten Schwerpunktabstand finden
+			Zerlegung[zerlX + zerlY * maxX] = SchwerPunkt::KleinsterSchwerpunktAbstand(aktBildSP, buchstabenSP, anzBuchstaben);
+			zerlY++;
 		}
+		zerlX++;
+	}
+	
+	std::cout<<"Bildausgabe\n\n";
+	for(int y_aussen = 0; y_aussen < maxY; y_aussen++)
+	{
+		for(int x_aussen = 0; x_aussen < maxX; x_aussen++)
+		{
+			std::cout<<(char)(32+Zerlegung[x_aussen + y_aussen * maxX]);
+		}
+		std::cout<<"\n";
 	}
 
 	delete []buchstabenSP;
@@ -259,12 +273,43 @@ void SchwerPunkt::SchwerpunktBild(unsigned char *Bild, int iBreite, int iHoehe, 
 
 int SchwerPunkt::KleinsterSchwerpunktAbstand(SchwerPunkt::schwerPunkt vergleichSP, SchwerPunkt::schwerPunkt* listeSP, int listenLaenge)
 {
-	int kleinsterAbstand = std::numeric_limits<int>::max();
+	float kleinsterAbstand = std::numeric_limits<float>::max();
+	float aktAbstand;
+	int summenVektor[3];
 	int rueckgabeSP = 0;
 	for(int i = 0; i < listenLaenge; i++)
 	{
+		aktAbstand = 0;
+		/*
 		//abstandSchwerpunkte ausrechnen
+		for(int rgb = 0; rgb < 3; rgb++)
+		{
+			summenVektor[rgb] = 0;
+			for(int achse = 0; achse < 3; achse++)
+			{
+				summenVektor[rgb] += vergleichSP.wert[rgb][achse] - listeSP[i].wert[rgb][achse];
+			}
+			aktAbstand += summenVektor[rgb] * summenVektor[rgb];
+		}
+		aktAbstand = sqrt(aktAbstand);
+		*/
+		//abstandSchwerpunkte ausrechnen
+		for(int rgb = 0; rgb < 3; rgb++)
+		{
+			summenVektor[rgb] = 0;
+			for(int achse = 0; achse < 3; achse++)
+			{
+				summenVektor[rgb] += pow(vergleichSP.wert[rgb][achse] - listeSP[i].wert[rgb][achse], 2);
+			}
+			aktAbstand += sqrt(summenVektor[rgb]);
+		}
+		aktAbstand /= 3;
 		//wenn neuer Abstand kleiner als gespeicherter -> neuen speichern
+		if(aktAbstand < kleinsterAbstand)
+		{
+			kleinsterAbstand = aktAbstand;
+			rueckgabeSP = i;
+		}
 	}
 	return rueckgabeSP;
 }
