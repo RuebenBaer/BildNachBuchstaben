@@ -22,6 +22,7 @@ bool MainApp::OnInit()
 BEGIN_EVENT_TABLE(MainFrame, wxFrame)
    EVT_MENU(ID_MAINWIN_QUIT, MainFrame::OnQuit)
    EVT_MENU(IdMenuOpenPic, MainFrame::OnOpenBild)
+   EVT_MENU(idMenuFarbFaktor, MainFrame::OnFarbFaktor)
    EVT_PAINT(OnPaint)
 END_EVENT_TABLE()
 
@@ -33,6 +34,7 @@ MainFrame::MainFrame(const wxString &title, const wxPoint &pos, const wxSize &si
 
     FileMenu->Append(ID_MAINWIN_QUIT, wxT("&Beenden"));
 	FileMenu->Append(IdMenuOpenPic, wxT("Bild &öffenen"));
+	FileMenu->Append(idMenuFarbFaktor, wxT("&Farbdivisor eingeben"));
 
     MenuBar->Append(FileMenu, _("&File"));
     SetMenuBar(MenuBar);
@@ -44,9 +46,9 @@ MainFrame::MainFrame(const wxString &title, const wxPoint &pos, const wxSize &si
     wxImage::AddHandler(TIFFHandler);
 	
 	BildMaske.LoadFile("./img/Buchstaben.tiff", wxBITMAP_TYPE_TIFF);
-	unsigned char *buchstabenDaten = BildMaske.GetData();
-	SchwerPunkt::BildZerlegenSchwerpunkt(NULL, 0, 0, buchstabenDaten, BildMaske.GetWidth(), BildMaske.GetHeight(), BildMaske.GetWidth()/95);
 
+	dFarbFaktor = 0.5;
+	
     CreateStatusBar(2);
     SetStatusText(_("Hello World!"));
 }
@@ -54,6 +56,15 @@ MainFrame::MainFrame(const wxString &title, const wxPoint &pos, const wxSize &si
 void MainFrame::OnQuit(wxCommandEvent & WXUNUSED(event))
 {
     Close(TRUE);
+}
+
+void MainFrame::OnFarbFaktor(wxCommandEvent &event)
+{
+	wxNumberEntryDialog nmbDlg(this, wxT("Bitte den Farbdivisor eingeben\n(Schwerpunkt)"), wxT("Zahleneingabe"), wxT("Caption"), (long)(1/dFarbFaktor), 0.1 , 512);
+	nmbDlg.ShowModal();
+	long zahl = nmbDlg.GetValue();
+	dFarbFaktor = 1/double(zahl);
+	return;
 }
 
 void MainFrame::OnOpenBild(wxCommandEvent &event)
@@ -71,8 +82,8 @@ void MainFrame::OnOpenBild(wxCommandEvent &event)
 	unsigned char *buchstabenDaten = BildMaske.GetData();
 	
 	BildZerlegen(urDaten, WandelBild.GetWidth(), WandelBild.GetHeight(), buchstabenDaten, BildMaske.GetWidth(), BildMaske.GetHeight(), BildMaske.GetWidth()/95);
-	BildZerlegenNormalverteilung(urDaten, WandelBild.GetWidth(), WandelBild.GetHeight(), buchstabenDaten, BildMaske.GetWidth(), BildMaske.GetHeight(),  BildMaske.GetWidth()/95);
-	SchwerPunkt::BildZerlegenSchwerpunkt(urDaten, WandelBild.GetWidth(), WandelBild.GetHeight(), buchstabenDaten, BildMaske.GetWidth(), BildMaske.GetHeight(),  BildMaske.GetWidth()/95);
+	//BildZerlegenNormalverteilung(urDaten, WandelBild.GetWidth(), WandelBild.GetHeight(), buchstabenDaten, BildMaske.GetWidth(), BildMaske.GetHeight(), BildMaske.GetWidth()/95);
+	SchwerPunkt::BildZerlegenSchwerpunkt(urDaten, WandelBild.GetWidth(), WandelBild.GetHeight(), buchstabenDaten, BildMaske.GetWidth(), BildMaske.GetHeight(),  BildMaske.GetWidth()/95, dFarbFaktor);
 
 	Refresh();
 	return;

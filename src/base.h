@@ -2,6 +2,7 @@
 #define __BASE_H
 
 #include "bildzerlegung.h"
+#include <wx/numdlg.h>
 
 class MainApp: public wxApp
 {
@@ -16,16 +17,18 @@ public:
 	void OnQuit(wxCommandEvent &event);
 	void OnOpenBild(wxCommandEvent &event);
 	void OnPaint(wxPaintEvent &event);
+	void OnFarbFaktor(wxCommandEvent &event);
 private:
-  wxFileDialog *PictureOpener;
-  wxImage WandelBild, BildMaske;
-  DECLARE_EVENT_TABLE()
+	wxFileDialog *PictureOpener;
+	wxImage WandelBild, BildMaske;
+	double dFarbFaktor;
+	DECLARE_EVENT_TABLE()
 };
 
 enum
 {
 	ID_MAINWIN_QUIT = wxID_HIGHEST+1,
-	IdMenuOpenPic
+	IdMenuOpenPic, idMenuFarbFaktor
 };
 
 
