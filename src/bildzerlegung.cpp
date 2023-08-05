@@ -86,8 +86,8 @@ void BildZerlegenNormalverteilung(unsigned char* urBild, int urBildBreite, int u
 	{
 		for(int y_aussen = 0; y_aussen < maxY; y_aussen++)
 		{
-			GesamtStreuung = 0;//std::numeric_limits<float>::max();
-			for(int bstbNr = 0; bstbNr < anzBuchstaben; bstbNr++)
+			GesamtStreuung = std::numeric_limits<float>::max();
+			for(int bstbNr = 1; bstbNr < anzBuchstaben; bstbNr++) //bei 1 anfangen um das Leerzeichen auszunehmen
 			{
 				aktStreuung = 0;
 				for(int x_innen = 0; x_innen < zeichenBreite; x_innen++)
@@ -160,49 +160,7 @@ double NormalVerteilung::Uebereinstimmung(Parameter verteilung1, Parameter verte
 	return rueckgabe;
 }
 
-void NormalVerteilung::SchnittpunktNV(Parameter verteilung1, Parameter verteilung2, double &sp1, double &sp2)
-{
-	double mu1, mu2, qmu1, qmu2, qsig1, qsig2, lnsigquot;
-	mu1 = verteilung1.mittelwert;
-	mu2 = verteilung2.mittelwert;
-	qmu1 = mu1 * mu1;
-	qmu2 = mu2 * mu2;
-	qsig1 = verteilung1.varianz;
-	qsig2 = verteilung2.varianz;
-	if(qsig1 == qsig2)
-	{
-		sp1 = sp2 = 0.5 * (mu1 + mu2);
-		return;
-	}
-	if(qsig1 == 0)
-	{
-		sp1 = sp2 = mu1;
-		return;
-	}
-	lnsigquot = log(sqrt(qsig2) / sqrt(qsig1));
-	double Radikant = pow(mu1 * qsig2 - mu2 * qsig1, 2) - (qsig2 - qsig1) * (qmu1 * qsig2 - qmu2 * qsig1 - 2 * qsig1 * qsig2 * lnsigquot);
-	
-	std::printf("\nlnsigquot = %0.5f", lnsigquot);
-	std::printf("\nRadikant = %0.5f\n\n", Radikant);
-	
-	if(Radikant < 0)
-	{
-		std::cout<<"Der Radikant (SchnittpunktNV) ist kleiner als Null!\n";
-		sp1 = std::numeric_limits<double>::min();
-		sp2 = std::numeric_limits<double>::max();
-		return;
-	}
-	
-	sp1 = (mu1 * qsig2 - mu2 * qsig1 + sqrt(Radikant)) / (qsig2 - qsig1);
-	sp2 = (mu1 * qsig2 - mu2 * qsig1 - sqrt(Radikant)) / (qsig2 - qsig1);
-	
-	return;
-}
-
-//NORMALVERTEILUNG
-
-//SCHWERPUNKT
-void SchwerPunkt::BildZerlegenSchwerpunkt(unsigned char* urBild, int urBildBreite, int urBildHoehe, unsigned char* buchstaben, int buchstabenBreite, int buchstabenHoehe, int zeichenBreite)
+void SchwerPunkt::BildZerlegenSchwerpunkt(unsigned char* urBild, int urBildBreite, int urBildHoehe, unsigned char* buchstaben, int buchstabenBreite, int buchstabenHoehe, int zeichenBreite, double dFarbHoehenFkt)
 {
 	int maxX = urBildBreite / zeichenBreite;
 	int maxY = urBildHoehe / buchstabenHoehe;
@@ -212,8 +170,7 @@ void SchwerPunkt::BildZerlegenSchwerpunkt(unsigned char* urBild, int urBildBreit
 	std::cout<<"maxX / maxY : "<<maxX<<" / "<<maxY<<'\n';
 	
 	int Zerlegung[maxX * maxY];
-	
-	double dFarbHoehenFkt = 0.02;
+
 	int anzBuchstaben = buchstabenBreite / zeichenBreite;
 	SchwerPunkt::schwerPunkt* buchstabenSP = new SchwerPunkt::schwerPunkt[anzBuchstaben];
 	unsigned char* tempBild = new unsigned char[buchstabenHoehe * zeichenBreite * 3];
@@ -280,14 +237,12 @@ void SchwerPunkt::BildZerlegenSchwerpunkt(unsigned char* urBild, int urBildBreit
 
 void SchwerPunkt::SchwerpunktBild(unsigned char *Bild, int iBreite, int iHoehe, double dFarbHoehenFkt, SchwerPunkt::schwerPunkt& swPkt)
 {
-	double dGesamtFarbHoehe[3];
+	double dGesamtFarbHoehe;
 	for(int achse = 0; achse < 3; achse++)
 	{
-		swPkt.wert[0][achse] = 0;
-		swPkt.wert[1][achse] = 0;
-		swPkt.wert[2][achse] = 0;
-		dGesamtFarbHoehe[achse] = 0;
+		swPkt.wert[achse] = 0;
 	}
+	dGesamtFarbHoehe = 0;
 	int iStelle;
 	for(int x = 0; x < iBreite; x++)
 	{
@@ -296,21 +251,17 @@ void SchwerPunkt::SchwerpunktBild(unsigned char *Bild, int iBreite, int iHoehe, 
 			iStelle = (x + y * iBreite) * 3;
 			for(int rgb = 0; rgb < 3; rgb++)
 			{
-				dGesamtFarbHoehe[rgb] += Bild[iStelle + rgb];
-				swPkt.wert[rgb][0] += Bild[iStelle + rgb] * x;
-				swPkt.wert[rgb][1] += Bild[iStelle + rgb] * y;
-				swPkt.wert[rgb][2] += Bild[iStelle + rgb] * Bild[iStelle + rgb] * dFarbHoehenFkt;
+				dGesamtFarbHoehe += Bild[iStelle + rgb];
+				swPkt.wert[0] += Bild[iStelle + rgb] * x;
+				swPkt.wert[1] += Bild[iStelle + rgb] * y;
+				swPkt.wert[2] += Bild[iStelle + rgb] * Bild[iStelle + rgb] * dFarbHoehenFkt;
 			}
 		}
 	}
-	for(int rgb = 0; rgb < 3; rgb++)
+	for(int achse = 0; achse < 3; achse++)
 	{
-		for(int achse = 0; achse < 3; achse++)
-		{
-			swPkt.wert[rgb][achse] /= dGesamtFarbHoehe[rgb];
-			//std::cout<<swPkt.wert[rgb][achse]<<",";
-		}
-		//if(rgb == 2)std::cout<<"\n";
+		swPkt.wert[achse] /= dGesamtFarbHoehe;
+		//std::cout<<swPkt.wert[rgb][achse]<<",";
 	}
 	return;
 }
@@ -319,35 +270,18 @@ int SchwerPunkt::KleinsterSchwerpunktAbstand(SchwerPunkt::schwerPunkt vergleichS
 {
 	float kleinsterAbstand = std::numeric_limits<float>::max();
 	float aktAbstand;
-	int summenVektor[3];
+	float summenVektor;
 	int rueckgabeSP = 0;
 	for(int i = 0; i < listenLaenge; i++)
 	{
-		aktAbstand = 0;
-		/*
 		//abstandSchwerpunkte ausrechnen
-		for(int rgb = 0; rgb < 3; rgb++)
+		summenVektor = 0;
+		for(int achse = 0; achse < 3; achse++)
 		{
-			summenVektor[rgb] = 0;
-			for(int achse = 0; achse < 3; achse++)
-			{
-				summenVektor[rgb] += vergleichSP.wert[rgb][achse] - listeSP[i].wert[rgb][achse];
-			}
-			aktAbstand += summenVektor[rgb] * summenVektor[rgb];
+			summenVektor += pow(vergleichSP.wert[achse] - listeSP[i].wert[achse], 2);
 		}
-		aktAbstand = sqrt(aktAbstand);
-		*/
-		//abstandSchwerpunkte ausrechnen
-		for(int rgb = 0; rgb < 3; rgb++)
-		{
-			summenVektor[rgb] = 0;
-			for(int achse = 0; achse < 3; achse++)
-			{
-				summenVektor[rgb] += pow(vergleichSP.wert[rgb][achse] - listeSP[i].wert[rgb][achse], 2);
-			}
-			aktAbstand += sqrt(summenVektor[rgb]);
-		}
-		aktAbstand /= 3;
+		
+		aktAbstand = sqrt(summenVektor);
 		//wenn neuer Abstand kleiner als gespeicherter -> neuen speichern
 		if(aktAbstand < kleinsterAbstand)
 		{
