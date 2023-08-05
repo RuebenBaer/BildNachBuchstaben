@@ -61,6 +61,8 @@ void BildZerlegen(unsigned char* urBild, int urBildBreite, int urBildHoehe, unsi
 	return;
 }
 
+
+//NORMALVERTEILUNG
 void BildZerlegenNormalverteilung(unsigned char* urBild, int urBildBreite, int urBildHoehe, unsigned char* buchstaben, int buchstabenBreite, int buchstabenHoehe, int zeichenBreite) 
 {
 	int maxX = urBildBreite / zeichenBreite;
@@ -158,6 +160,48 @@ double NormalVerteilung::Uebereinstimmung(Parameter verteilung1, Parameter verte
 	return rueckgabe;
 }
 
+void NormalVerteilung::SchnittpunktNV(Parameter verteilung1, Parameter verteilung2, double &sp1, double &sp2)
+{
+	double mu1, mu2, qmu1, qmu2, qsig1, qsig2, lnsigquot;
+	mu1 = verteilung1.mittelwert;
+	mu2 = verteilung2.mittelwert;
+	qmu1 = mu1 * mu1;
+	qmu2 = mu2 * mu2;
+	qsig1 = verteilung1.varianz;
+	qsig2 = verteilung2.varianz;
+	if(qsig1 == qsig2)
+	{
+		sp1 = sp2 = 0.5 * (mu1 + mu2);
+		return;
+	}
+	if(qsig1 == 0)
+	{
+		sp1 = sp2 = mu1;
+		return;
+	}
+	lnsigquot = log(sqrt(qsig2) / sqrt(qsig1));
+	double Radikant = pow(mu1 * qsig2 - mu2 * qsig1, 2) - (qsig2 - qsig1) * (qmu1 * qsig2 - qmu2 * qsig1 - 2 * qsig1 * qsig2 * lnsigquot);
+	
+	std::printf("\nlnsigquot = %0.5f", lnsigquot);
+	std::printf("\nRadikant = %0.5f\n\n", Radikant);
+	
+	if(Radikant < 0)
+	{
+		std::cout<<"Der Radikant (SchnittpunktNV) ist kleiner als Null!\n";
+		sp1 = std::numeric_limits<double>::min();
+		sp2 = std::numeric_limits<double>::max();
+		return;
+	}
+	
+	sp1 = (mu1 * qsig2 - mu2 * qsig1 + sqrt(Radikant)) / (qsig2 - qsig1);
+	sp2 = (mu1 * qsig2 - mu2 * qsig1 - sqrt(Radikant)) / (qsig2 - qsig1);
+	
+	return;
+}
+
+//NORMALVERTEILUNG
+
+//SCHWERPUNKT
 void SchwerPunkt::BildZerlegenSchwerpunkt(unsigned char* urBild, int urBildBreite, int urBildHoehe, unsigned char* buchstaben, int buchstabenBreite, int buchstabenHoehe, int zeichenBreite)
 {
 	int maxX = urBildBreite / zeichenBreite;

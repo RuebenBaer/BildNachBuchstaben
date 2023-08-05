@@ -19,6 +19,7 @@ namespace NormalVerteilung
 	
 	Parameter Analyse(int* einKanalBild, int bildBreite, int bildHoehe);
 	double Uebereinstimmung(Parameter verteilung1, Parameter verteilung2);
+	void SchnittpunktNV(Parameter verteilung1, Parameter verteilung2, double &sp1, double &sp2);
 }
 
 namespace SchwerPunkt
