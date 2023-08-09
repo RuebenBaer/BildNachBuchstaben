@@ -199,6 +199,12 @@ void NormalVerteilung::SchnittpunktNV(Parameter verteilung1, Parameter verteilun
 	return;
 }
 
+double NormalVerteilung::VerteilungsFunktion(Parameter verteilung, double wert)
+{
+	double argument = (wert - verteilung.mittelwert) / (sqrt(2 * verteilung.varianz));
+	return (0.5 * (1 + erf(argument)));
+}
+
 //NORMALVERTEILUNG
 
 //SCHWERPUNKT
