@@ -157,6 +157,31 @@ NormalVerteilung::Parameter NormalVerteilung::Analyse(int* grayscale_Bild, int b
 double NormalVerteilung::Uebereinstimmung(Parameter verteilung1, Parameter verteilung2)
 {
 	double rueckgabe = 0;
+	double sp1, sp2;
+	SchnittpunktNV(verteilung1, verteilung2, sp1, sp2);
+	if(sp1 == sp2)
+	{
+		return rueckgabe;
+	}
+	if(sp2 < sp1)//sp1 und sp2 tauschen
+	{
+		rueckgabe = sp1;
+		sp1 = sp2;
+		sp2 = rueckgabe;
+	}
+	
+	double P11 = VerteilungsFunktion(verteilung1, sp1);
+	double P21 = VerteilungsFunktion(verteilung2, sp1);
+	double P12 = VerteilungsFunktion(verteilung1, sp2);
+	double P22 = VerteilungsFunktion(verteilung2, sp2);
+	
+	if(P11 < P21)
+	{
+		rueckgabe = P11 + P22 - P21 + 1.0 - P12;
+	}else
+	{
+		rueckgabe = P21 + P12 - P11 + 1.0 - P22;
+	}
 	return rueckgabe;
 }
 
