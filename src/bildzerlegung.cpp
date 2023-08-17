@@ -76,37 +76,50 @@ void BildZerlegenNormalverteilung(unsigned char* urBild, int urBildBreite, int u
 	
 	int anzBuchstaben = buchstabenBreite / zeichenBreite;
 	std::cout<<"anzBuchstaben = "<<anzBuchstaben<<'\n';
-	float GesamtStreuung;
+	float GesamtUebereinstimmung;
 
-	float aktStreuung;
+	float aktUebereinstimmung;
+	NormalVerteilung::Parameter BuchstabenParameter[anzBuchstaben];
 	
 	int* einKanalBild = new int[zeichenBreite * buchstabenHoehe];
+	
+	for(int bstbNr = 0; bstbNr < anzBuchstaben; bstbNr++) //bei 1 anfangen um das Leerzeichen auszunehmen
+	{
+		for(int x_innen = 0; x_innen < zeichenBreite; x_innen++)
+		{
+			for(int y_innen = 0; y_innen < buchstabenHoehe; y_innen++)
+			{
+				int bstIndex = ((x_innen + bstbNr * zeichenBreite)  + y_innen * buchstabenBreite) * 3;
+				einKanalBild [x_innen + y_innen * zeichenBreite] = (int)(buchstaben[bstIndex]*0.299f + buchstaben[bstIndex + 1]*0.587f + buchstaben[bstIndex + 2]*0.114f);
+			}
+		}
+		BuchstabenParameter[bstbNr] = NormalVerteilung::Analyse(einKanalBild, zeichenBreite, buchstabenHoehe);
+	}
 	
 	for(int x_aussen = 0; x_aussen < maxX; x_aussen++)
 	{
 		for(int y_aussen = 0; y_aussen < maxY; y_aussen++)
 		{
-			GesamtStreuung = std::numeric_limits<float>::max();
-			for(int bstbNr = 1; bstbNr < anzBuchstaben; bstbNr++) //bei 1 anfangen um das Leerzeichen auszunehmen
+			aktUebereinstimmung = 0;
+			for(int x_innen = 0; x_innen < zeichenBreite; x_innen++)
 			{
-				aktStreuung = 0;
-				for(int x_innen = 0; x_innen < zeichenBreite; x_innen++)
+				for(int y_innen = 0; y_innen < buchstabenHoehe; y_innen++)
 				{
-					for(int y_innen = 0; y_innen < buchstabenHoehe; y_innen++)
-					{
-						int urIndex = ((x_aussen * zeichenBreite + x_innen) + (y_aussen * buchstabenHoehe + y_innen) * urBildBreite) * 3;
-						int bstIndex = ((x_innen + bstbNr * zeichenBreite)  + y_innen * buchstabenBreite) * 3;
-						
-						einKanalBild [x_innen + y_innen * zeichenBreite] = (int)(urBild[urIndex]*0.299f + urBild[urIndex + 1]*0.587f + urBild[urIndex + 2]*0.114f);
-						einKanalBild [x_innen + y_innen * zeichenBreite] -= (int)(buchstaben[bstIndex]*0.299f + buchstaben[bstIndex + 1]*0.587f + buchstaben[bstIndex + 2]*0.114f);
-					}
+					int urIndex = ((x_aussen * zeichenBreite + x_innen) + (y_aussen * buchstabenHoehe + y_innen) * urBildBreite) * 3;
+					
+					einKanalBild [x_innen + y_innen * zeichenBreite] = (int)(urBild[urIndex]*0.299f + urBild[urIndex + 1]*0.587f + urBild[urIndex + 2]*0.114f);
 				}
-				NormalVerteilung::Parameter parm = NormalVerteilung::Analyse(einKanalBild, zeichenBreite, buchstabenHoehe);
-				aktStreuung = parm.varianz;
-				if(aktStreuung < GesamtStreuung)
+			}
+			NormalVerteilung::Parameter parm = NormalVerteilung::Analyse(einKanalBild, zeichenBreite, buchstabenHoehe);
+				
+			GesamtUebereinstimmung = 0;//std::numeric_limits<float>::min();
+			for(int bstbNr = 0; bstbNr < anzBuchstaben; bstbNr++) //bei 1 anfangen um das Leerzeichen auszunehmen
+			{
+				aktUebereinstimmung = NormalVerteilung::Uebereinstimmung(parm, BuchstabenParameter[bstbNr]);
+				if(aktUebereinstimmung > GesamtUebereinstimmung)
 				{
 					Zerlegung[x_aussen + y_aussen * maxX] = bstbNr;
-					GesamtStreuung = aktStreuung;
+					GesamtUebereinstimmung = aktUebereinstimmung;
 				}
 			}
 		}
@@ -207,8 +220,8 @@ void NormalVerteilung::SchnittpunktNV(Parameter verteilung1, Parameter verteilun
 	lnsigquot = log(sqrt(qsig2) / sqrt(qsig1));
 	double Radikant = pow(mu1 * qsig2 - mu2 * qsig1, 2) - (qsig2 - qsig1) * (qmu1 * qsig2 - qmu2 * qsig1 - 2 * qsig1 * qsig2 * lnsigquot);
 	
-	std::printf("\nlnsigquot = %0.5f", lnsigquot);
-	std::printf("\nRadikant = %0.5f\n\n", Radikant);
+	//std::printf("\nlnsigquot = %0.5f", lnsigquot);
+	//std::printf("\nRadikant = %0.5f\n\n", Radikant);
 	
 	if(Radikant < 0)
 	{

@@ -82,8 +82,8 @@ void MainFrame::OnOpenBild(wxCommandEvent &event)
 	unsigned char *buchstabenDaten = BildMaske.GetData();
 	
 	BildZerlegen(urDaten, WandelBild.GetWidth(), WandelBild.GetHeight(), buchstabenDaten, BildMaske.GetWidth(), BildMaske.GetHeight(), BildMaske.GetWidth()/95);
-	//BildZerlegenNormalverteilung(urDaten, WandelBild.GetWidth(), WandelBild.GetHeight(), buchstabenDaten, BildMaske.GetWidth(), BildMaske.GetHeight(), BildMaske.GetWidth()/95);
-	SchwerPunkt::BildZerlegenSchwerpunkt(urDaten, WandelBild.GetWidth(), WandelBild.GetHeight(), buchstabenDaten, BildMaske.GetWidth(), BildMaske.GetHeight(),  BildMaske.GetWidth()/95, dFarbFaktor);
+	BildZerlegenNormalverteilung(urDaten, WandelBild.GetWidth(), WandelBild.GetHeight(), buchstabenDaten, BildMaske.GetWidth(), BildMaske.GetHeight(), BildMaske.GetWidth()/95);
+	//SchwerPunkt::BildZerlegenSchwerpunkt(urDaten, WandelBild.GetWidth(), WandelBild.GetHeight(), buchstabenDaten, BildMaske.GetWidth(), BildMaske.GetHeight(),  BildMaske.GetWidth()/95, dFarbFaktor);
 
 	Refresh();
 	return;
