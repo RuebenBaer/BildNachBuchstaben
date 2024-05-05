@@ -4,6 +4,7 @@
 #endif
 
 #include "base.h"
+#include "filter.h"
 
 //void BildZerlegen(unsigned char* urBild, int urBildBreite, int urBildHoehe, unsigned char* buchstaben, int buchstabenBreite, int buchstabenHoehe, int zeichenBreite);
 
@@ -19,13 +20,6 @@ bool MainApp::OnInit()
    return TRUE;
 }
 
-BEGIN_EVENT_TABLE(MainFrame, wxFrame)
-   EVT_MENU(ID_MAINWIN_QUIT, MainFrame::OnQuit)
-   EVT_MENU(IdMenuOpenPic, MainFrame::OnOpenBild)
-   EVT_MENU(idMenuFarbFaktor, MainFrame::OnFarbFaktor)
-   EVT_PAINT(OnPaint)
-END_EVENT_TABLE()
-
 MainFrame::MainFrame(const wxString &title, const wxPoint &pos, const wxSize &size)
     : wxFrame((wxFrame *) NULL, -1, title, pos, size)
 {
@@ -35,11 +29,13 @@ MainFrame::MainFrame(const wxString &title, const wxPoint &pos, const wxSize &si
     FileMenu->Append(ID_MAINWIN_QUIT, wxT("&Beenden"));
 	FileMenu->Append(IdMenuOpenPic, wxT("Bild &öffenen"));
 	FileMenu->Append(idMenuFarbFaktor, wxT("&Farbdivisor eingeben"));
+	FileMenu->Append(idMenuBildInBuchstabe, wxT("Bild &in Buchstaben wandeln"));
+	FileMenu->Append(idMenuBildMaskieren, wxT("Bild &maskieren"));
 
     MenuBar->Append(FileMenu, _("&File"));
     SetMenuBar(MenuBar);
 
-    PictureOpener = new wxFileDialog(this, wxT("Bild auswaehlen"),wxT(""),wxT(""),wxT("*.jpg"),1);
+    PictureOpener = new wxFileDialog(this, wxT("Bild auswählen"),wxT(""),wxT(""),wxT("*.jpg"),1);
 	wxImageHandler *JPEGHandler = new wxJPEGHandler();
     wxImage::AddHandler(JPEGHandler);
 	wxImageHandler *TIFFHandler = new wxTIFFHandler();
@@ -51,6 +47,14 @@ MainFrame::MainFrame(const wxString &title, const wxPoint &pos, const wxSize &si
 	
     CreateStatusBar(2);
     SetStatusText(_("Hello World!"));
+	
+	
+	Bind(wxEVT_PAINT, &MainFrame::OnPaint, this);
+	Bind(wxEVT_MENU, &MainFrame::OnQuit, this, ID_MAINWIN_QUIT);
+	Bind(wxEVT_MENU, &MainFrame::OnOpenBild, this, IdMenuOpenPic);
+	Bind(wxEVT_MENU, &MainFrame::OnFarbFaktor, this, idMenuFarbFaktor);
+	Bind(wxEVT_MENU, &MainFrame::OnBildInBuchstabe, this, idMenuBildInBuchstabe);
+	Bind(wxEVT_MENU, & MainFrame::OnBildMaske, this, idMenuBildMaskieren);
 }
 
 void MainFrame::OnQuit(wxCommandEvent & WXUNUSED(event))
@@ -78,6 +82,17 @@ void MainFrame::OnOpenBild(wxCommandEvent &event)
 	if(WandelBild.Ok())WandelBild.Destroy();
 	WandelBild.LoadFile(PictureOpener->GetPath(), wxBITMAP_TYPE_JPEG);
 	
+	Refresh();
+	return;
+}
+
+void MainFrame::OnBildInBuchstabe(wxCommandEvent& event)
+{
+	if(!WandelBild.Ok())
+	{
+		std::cout<<"Kein Bild geladen\n"<<std::flush;
+		return;
+	}
 	unsigned char *urDaten = WandelBild.GetData();
 	unsigned char *buchstabenDaten = BildMaske.GetData();
 	
@@ -93,7 +108,35 @@ void MainFrame::OnPaint(wxPaintEvent &event)
 {
 	wxPaintDC dc(this);
 	if(BildMaske.Ok())dc.DrawBitmap(wxBitmap(BildMaske), 0, 0);
-	if(WandelBild.Ok())dc.DrawBitmap(wxBitmap(WandelBild), 0, BildMaske.GetHeight());
+	if(WandelBild.Ok())
+	{
+		dc.DrawBitmap(wxBitmap(WandelBild), 0, BildMaske.GetHeight());
+	}else{
+		std::cout<<"Wandelbild defekt\n";
+	}
 	
+	return;
+}
+
+void MainFrame::OnBildMaske(wxCommandEvent& event)
+{
+	if(!WandelBild.Ok())
+	{
+		std::cout<<"Kein Bild geladen\n"<<std::flush;
+		return;
+	}
+	int nB, nH;
+	unsigned char *urDaten = WandelBild.GetData();
+	
+	filter maske;
+	if(maske.filterAnwenden(urDaten, WandelBild.GetWidth(), WandelBild.GetHeight(), nB, nH))
+	{
+		std::cout<<"SetData WandelBild - b = "<<nB<<" - h = "<<nH<<"\n"<<std::flush;
+		std::cout<<"Resize Wandelbildgroesse\n"<<std::flush;
+		//WandelBild.Resize(wxSize(nB, nH), wxPoint(0, 0));
+	}else{
+		std::cout<<"Loesche neuBild\n"<<std::flush;
+	}
+	Refresh();
 	return;
 }

@@ -18,18 +18,19 @@ public:
 	void OnOpenBild(wxCommandEvent &event);
 	void OnPaint(wxPaintEvent &event);
 	void OnFarbFaktor(wxCommandEvent &event);
+	
+	void OnBildInBuchstabe(wxCommandEvent& event);
+	void OnBildMaske(wxCommandEvent& event);
 private:
 	wxFileDialog *PictureOpener;
 	wxImage WandelBild, BildMaske;
 	double dFarbFaktor;
-	DECLARE_EVENT_TABLE()
 };
 
 enum
 {
 	ID_MAINWIN_QUIT = wxID_HIGHEST+1,
-	IdMenuOpenPic, idMenuFarbFaktor
+	IdMenuOpenPic, idMenuFarbFaktor, idMenuBildInBuchstabe, idMenuBildMaskieren
 };
-
 
 #endif
