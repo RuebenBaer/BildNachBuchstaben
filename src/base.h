@@ -24,6 +24,7 @@ public:
 private:
 	wxFileDialog *PictureOpener;
 	wxImage WandelBild, BildMaske;
+	wxImage AnzeigeBild, ArbeitsBild;
 	double dFarbFaktor;
 };
 

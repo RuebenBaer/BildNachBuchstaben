@@ -82,12 +82,23 @@ void MainFrame::OnOpenBild(wxCommandEvent &event)
 	if(WandelBild.Ok())WandelBild.Destroy();
 	WandelBild.LoadFile(PictureOpener->GetPath(), wxBITMAP_TYPE_JPEG);
 	
+	if(ArbeitsBild.Ok())
+	{
+		ArbeitsBild.Destroy();
+		std::cout<<"ArbeitsBild ist "<<ArbeitsBild.Ok()<<std::endl;
+	}
+	
 	Refresh();
 	return;
 }
 
 void MainFrame::OnBildInBuchstabe(wxCommandEvent& event)
 {
+	if(ArbeitsBild.Ok())
+	{
+		ArbeitsBild.Destroy();
+		std::cout<<"ArbeitsBild ist "<<ArbeitsBild.Ok()<<std::endl;
+	}
 	if(!WandelBild.Ok())
 	{
 		std::cout<<"Kein Bild geladen\n"<<std::flush;
@@ -107,12 +118,17 @@ void MainFrame::OnBildInBuchstabe(wxCommandEvent& event)
 void MainFrame::OnPaint(wxPaintEvent &event)
 {
 	wxPaintDC dc(this);
-	if(BildMaske.Ok())dc.DrawBitmap(wxBitmap(BildMaske), 0, 0);
-	if(WandelBild.Ok())
+
+	if(ArbeitsBild.Ok())
 	{
+		dc.DrawBitmap(wxBitmap(ArbeitsBild), 0, 0);
+	}
+	else if(WandelBild.Ok())
+	{
+		if(BildMaske.Ok())dc.DrawBitmap(wxBitmap(BildMaske), 0, 0);
 		dc.DrawBitmap(wxBitmap(WandelBild), 0, BildMaske.GetHeight());
 	}else{
-		std::cout<<"Wandelbild defekt\n";
+		//std::cout<<"Wandelbild defekt\n";
 	}
 	
 	return;
@@ -126,16 +142,16 @@ void MainFrame::OnBildMaske(wxCommandEvent& event)
 		return;
 	}
 	int nB, nH;
-	unsigned char *urDaten = WandelBild.GetData();
+	if(ArbeitsBild.Ok())ArbeitsBild.Destroy();
+	ArbeitsBild = WandelBild.Copy();
+	unsigned char *urDaten = ArbeitsBild.GetData();
 	
 	filter maske;
-	if(maske.filterAnwenden(urDaten, WandelBild.GetWidth(), WandelBild.GetHeight(), nB, nH))
+	if(maske.filterAnwenden(urDaten, ArbeitsBild.GetWidth(), ArbeitsBild.GetHeight(), nB, nH))
 	{
-		std::cout<<"SetData WandelBild - b = "<<nB<<" - h = "<<nH<<"\n"<<std::flush;
-		std::cout<<"Resize Wandelbildgroesse\n"<<std::flush;
-		//WandelBild.Resize(wxSize(nB, nH), wxPoint(0, 0));
-	}else{
-		std::cout<<"Loesche neuBild\n"<<std::flush;
+		std::cout<<"SetData ArbeitsBild - b = "<<nB<<" - h = "<<nH<<"\n"<<std::flush;
+		std::cout<<"Resize ArbeitsBildgroesse\n"<<std::flush;
+		ArbeitsBild.Resize(wxSize(nB, nH), wxPoint(0, 0));
 	}
 	Refresh();
 	return;

@@ -53,7 +53,7 @@ $(OBJDIR)\bildzerlegung.o: $(SRCDIR)\bildzerlegung.cpp
 	if not exist $(OBJDIR) mkdir $(OBJDIR)
 	$(CXX) $(CPPFLAGS) $(DEFS) $(INCLUDES) -c $< -o $@
 
-$(OBJDIR)\base.o: $(SRCDIR)\base.cpp
+$(OBJDIR)\base.o: $(SRCDIR)\base.cpp $(SRCDIR)\filter.h
 	if not exist $(OBJDIR) mkdir $(OBJDIR)
 	$(CXX) $(CPPFLAGS) $(DEFS) $(INCLUDES) -c $< -o $@
 
