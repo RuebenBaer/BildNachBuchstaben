@@ -41,7 +41,8 @@ OBJDIR = obj
 SRCDIR = src
 OBJS = \
 	$(OBJDIR)\base.o \
-	$(OBJDIR)\bildzerlegung.o
+	$(OBJDIR)\bildzerlegung.o \
+	$(OBJDIR)\FilterDialog.o
 OUT = BIB.exe
 
 .PHONEY: all clean
@@ -50,6 +51,10 @@ all: $(OBJS)
 	$(CXX) $(CPPFLAGS) $(DEFS) -L$(WXLIBPATH) -o $(OUT) $(OBJS) -s $(LIBS)
 
 $(OBJDIR)\bildzerlegung.o: $(SRCDIR)\bildzerlegung.cpp
+	if not exist $(OBJDIR) mkdir $(OBJDIR)
+	$(CXX) $(CPPFLAGS) $(DEFS) $(INCLUDES) -c $< -o $@
+
+$(OBJDIR)\FilterDialog.o: $(SRCDIR)\FilterDialog.cpp
 	if not exist $(OBJDIR) mkdir $(OBJDIR)
 	$(CXX) $(CPPFLAGS) $(DEFS) $(INCLUDES) -c $< -o $@
 

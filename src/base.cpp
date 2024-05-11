@@ -4,7 +4,6 @@
 #endif
 
 #include "base.h"
-#include "filter.h"
 
 //void BildZerlegen(unsigned char* urBild, int urBildBreite, int urBildHoehe, unsigned char* buchstaben, int buchstabenBreite, int buchstabenHoehe, int zeichenBreite);
 
@@ -136,6 +135,7 @@ void MainFrame::OnPaint(wxPaintEvent &event)
 
 void MainFrame::OnBildMaske(wxCommandEvent& event)
 {
+	FilterDialog(7, this, wxID_ANY, "Bildfilter").ShowModal();
 	if(!WandelBild.Ok())
 	{
 		std::cout<<"Kein Bild geladen\n"<<std::flush;
