@@ -7,6 +7,7 @@
 #endif
 #include <wx/dialog.h>
 #include <wx/propgrid/props.h>
+#include <vector>
 
 class FilterDialog : public wxDialog
 {
@@ -21,11 +22,14 @@ public:
 				const wxString &name=wxDialogNameStr);
 	~FilterDialog();
 private:
+	void DialogErneuern(int filterGroesse);
 	void SetzeFilterGroesse(int groesse);
 	void OnQuit(wxCloseEvent &event);
 	
 	wxTextCtrl *filterGroesseCaption, *filterGroesseTextCtrl;
 	
+	std::vector<wxTextCtrl*> TextCtrlContainer;
+	std::vector<wxBoxSizer*> BoxSizerContainer;
 	wxBoxSizer *filterSizer;
 };
 

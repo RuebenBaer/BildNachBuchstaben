@@ -16,26 +16,36 @@ FilterDialog::FilterDialog(int filterGroesse,
 		wxMessageDialog(this, wxT("Die Filtergröße muss ungerade sein."), wxT("Fehler bei Filtergröße")).ShowModal();
 		QueueEvent(new wxCloseEvent(wxEVT_CLOSE_WINDOW));
 	}
-	
-	wxNumericPropertyValidator numVal(wxNumericPropertyValidator::Signed);
-	
-	wxBoxSizer *vSizer = new wxBoxSizer(wxVERTICAL);
-	for(int i=0; i< filterGroesse; i++)
-	{
-		filterSizer = new wxBoxSizer(wxHORIZONTAL);
-		for(int k=0; k< filterGroesse; k++)
-		{
-			filterSizer->Add(new wxTextCtrl(this, 10000+(i*filterGroesse+k), "", wxPoint(0, 0), wxSize(25, 25), wxTE_CENTRE, numVal),wxFIXED_MINSIZE|wxEXPAND);
-		}
-		vSizer->Add(filterSizer);
-	}
-	SetSizer(vSizer);
+	DialogErneuern(filterGroesse);
 	//filterSizer->FitInside(this);
 	
 	Bind(wxEVT_CLOSE_WINDOW, &FilterDialog::OnQuit, this);
 }
+
 FilterDialog::~FilterDialog()
 {}
+
+void FilterDialog::DialogErneuern(int filterGroesse)
+{
+	wxNumericPropertyValidator numVal(wxNumericPropertyValidator::Signed);
+	
+	filterSizer = new wxBoxSizer(wxVERTICAL);
+	for(int i=0; i< filterGroesse; i++)
+	{
+		wxBoxSizer* hSizer = new wxBoxSizer(wxHORIZONTAL);
+		BoxSizerContainer.push_back(hSizer);
+		for(int k=0; k< filterGroesse; k++)
+		{
+			wxTextCtrl* txtctrl = new wxTextCtrl(this, 10000+(i*filterGroesse+k), wxString::Format("%d", i*filterGroesse+k), wxPoint(0, 0), wxSize(25, 25), wxTE_CENTRE, numVal);
+			hSizer->Add(txtctrl, wxFIXED_MINSIZE|wxEXPAND);
+			
+			TextCtrlContainer.push_back(txtctrl);
+		}
+		filterSizer->Add(hSizer);
+	}
+	SetSizer(filterSizer);
+	return;
+}
 
 void FilterDialog::SetzeFilterGroesse(int groesse)
 {
