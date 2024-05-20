@@ -16,24 +16,64 @@ FilterDialog::FilterDialog(int filterGroesse,
 		wxMessageDialog(this, wxT("Die Filtergröße muss ungerade sein."), wxT("Fehler bei Filtergröße")).ShowModal();
 		QueueEvent(new wxCloseEvent(wxEVT_CLOSE_WINDOW));
 	}
+	
 	DialogErneuern(filterGroesse);
-	//filterSizer->FitInside(this);
 	
 	Bind(wxEVT_CLOSE_WINDOW, &FilterDialog::OnQuit, this);
+	Bind(wxEVT_BUTTON, &FilterDialog::NeuerFilter, this, BTN_ID_NEU);
+	Bind(wxEVT_BUTTON, &FilterDialog::FilterAnwenden, this, wxID_OK);
 }
 
 FilterDialog::~FilterDialog()
-{}
+{
+	std::cout<<"TextCtrlContainer leeren\n";
+	while(!TextCtrlContainer.empty())
+	{
+		wxTextCtrl* txtctrl = TextCtrlContainer.back();
+		TextCtrlContainer.pop_back();
+		txtctrl->Destroy();
+	};
+	std::cout<<"FilterDialog verlassen...\n";
+}
+
+void FilterDialog::NeuerFilter(wxCommandEvent &event)
+{
+	DialogErneuern(3);
+	Layout();
+	Refresh();
+	return;
+}
+
+void FilterDialog::FilterAnwenden(wxCommandEvent &event)
+{
+	wxMessageDialog(this, wxString::Format("Filter wird angewendet"), "Filter anwenden").ShowModal();
+	return;
+}
 
 void FilterDialog::DialogErneuern(int filterGroesse)
 {
+	while(!TextCtrlContainer.empty())
+	{
+		wxTextCtrl* txtctrl = TextCtrlContainer.back();
+		TextCtrlContainer.pop_back();
+		txtctrl->Destroy();
+	};
+
+	if(this->GetSizer() != NULL)
+	{
+		this->GetSizer()->Clear(true);
+	}
+	this->SetSizer(NULL, true);
+	Layout();
+
+	filterSizer = new wxBoxSizer(wxVERTICAL);
+	hauptSizer = new wxBoxSizer(wxVERTICAL);
+
 	wxNumericPropertyValidator numVal(wxNumericPropertyValidator::Signed);
 	
-	filterSizer = new wxBoxSizer(wxVERTICAL);
 	for(int i=0; i< filterGroesse; i++)
 	{
 		wxBoxSizer* hSizer = new wxBoxSizer(wxHORIZONTAL);
-		BoxSizerContainer.push_back(hSizer);
 		for(int k=0; k< filterGroesse; k++)
 		{
 			wxTextCtrl* txtctrl = new wxTextCtrl(this, 10000+(i*filterGroesse+k), wxString::Format("%d", i*filterGroesse+k), wxPoint(0, 0), wxSize(25, 25), wxTE_CENTRE, numVal);
@@ -43,7 +83,11 @@ void FilterDialog::DialogErneuern(int filterGroesse)
 		}
 		filterSizer->Add(hSizer);
 	}
-	SetSizer(filterSizer);
+
+	hauptSizer->Add(filterSizer);
+	hauptSizer->Add(new wxButton(this, wxID_OK, "OK"));
+	hauptSizer->Add(new wxButton(this, BTN_ID_NEU, "Neuer Filter"));
+	SetSizer(hauptSizer);
 	return;
 }
 

@@ -135,7 +135,7 @@ void MainFrame::OnPaint(wxPaintEvent &event)
 
 void MainFrame::OnBildMaske(wxCommandEvent& event)
 {
-	FilterDialog(7, this, wxID_ANY, "Bildfilter").ShowModal();
+	FilterDialog(3, this, wxID_ANY, "Bildfilter").ShowModal();
 	if(!WandelBild.Ok())
 	{
 		std::cout<<"Kein Bild geladen\n"<<std::flush;

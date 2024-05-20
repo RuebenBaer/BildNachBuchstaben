@@ -24,18 +24,21 @@ public:
 private:
 	void DialogErneuern(int filterGroesse);
 	void SetzeFilterGroesse(int groesse);
+	void NeuerFilter(wxCommandEvent &event);
+	void FilterAnwenden(wxCommandEvent &event);
 	void OnQuit(wxCloseEvent &event);
 	
 	wxTextCtrl *filterGroesseCaption, *filterGroesseTextCtrl;
 	
 	std::vector<wxTextCtrl*> TextCtrlContainer;
-	std::vector<wxBoxSizer*> BoxSizerContainer;
-	wxBoxSizer *filterSizer;
+	wxBoxSizer *filterSizer = NULL;
+	wxBoxSizer *hauptSizer;
 };
 
 enum
 {
-	MENU_ID_QUIT = wxID_HIGHEST+1
+	MENU_ID_QUIT = wxID_HIGHEST+1,
+	BTN_ID_NEU
 };
 
 #endif //__FILTERDIALOG_H_
