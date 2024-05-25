@@ -3,7 +3,7 @@
 
 #include "bildzerlegung.h"
 #include <wx/numdlg.h>
-#include "filter.h"
+//#include "filter.h"
 #include "FilterDialog.h"
 
 class MainApp: public wxApp

@@ -42,7 +42,8 @@ SRCDIR = src
 OBJS = \
 	$(OBJDIR)\base.o \
 	$(OBJDIR)\bildzerlegung.o \
-	$(OBJDIR)\FilterDialog.o
+	$(OBJDIR)\FilterDialog.o \
+	$(OBJDIR)\filter.o
 OUT = BIB.exe
 
 .PHONEY: all clean
@@ -58,7 +59,11 @@ $(OBJDIR)\FilterDialog.o: $(SRCDIR)\FilterDialog.cpp
 	if not exist $(OBJDIR) mkdir $(OBJDIR)
 	$(CXX) $(CPPFLAGS) $(DEFS) $(INCLUDES) -c $< -o $@
 
-$(OBJDIR)\base.o: $(SRCDIR)\base.cpp $(SRCDIR)\filter.h
+$(OBJDIR)\base.o: $(SRCDIR)\base.cpp
+	if not exist $(OBJDIR) mkdir $(OBJDIR)
+	$(CXX) $(CPPFLAGS) $(DEFS) $(INCLUDES) -c $< -o $@
+
+$(OBJDIR)\filter.o: $(SRCDIR)\filter.cpp
 	if not exist $(OBJDIR) mkdir $(OBJDIR)
 	$(CXX) $(CPPFLAGS) $(DEFS) $(INCLUDES) -c $< -o $@
 

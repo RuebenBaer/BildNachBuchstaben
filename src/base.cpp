@@ -135,10 +135,35 @@ void MainFrame::OnPaint(wxPaintEvent &event)
 
 void MainFrame::OnBildMaske(wxCommandEvent& event)
 {
-	FilterDialog(3, this, wxID_ANY, "Bildfilter").ShowModal();
+	filter *maske = new filter(3);
+	if(maske == NULL)
+	{
+		std::cout<<"Maske erstellen fehlgeschlagen\n";
+		return;
+	}
+	for(int i = 0; i < 3; i++)
+		for(int k = 0; k < 3; k++)
+		{
+			maske->filterMaske[i + k * 3] = ((i+1)*10+(k+1));
+		}
+	std::cout<<"Maske:\n";
+	for(int i = 0; i < 3; i++)
+	{
+		for(int k = 0; k < 3; k++)
+		{
+			std::cout<<"\t"<<maske->filterMaske[i + k * 3];
+		}
+		std::cout<<"\n";
+	}
+	FilterDialog *fltdlg = new FilterDialog(NULL, this, wxID_ANY, "Bildfilter");
+	fltdlg->ShowModal();
+	delete fltdlg;
 	if(!WandelBild.Ok())
 	{
 		std::cout<<"Kein Bild geladen\n"<<std::flush;
+		std::cout<<"delete maske;..."<<std::endl;
+		delete maske;
+		std::cout<<"delete maske; erfolgreich"<<std::endl;
 		return;
 	}
 	int nB, nH;
@@ -146,13 +171,16 @@ void MainFrame::OnBildMaske(wxCommandEvent& event)
 	ArbeitsBild = WandelBild.Copy();
 	unsigned char *urDaten = ArbeitsBild.GetData();
 	
-	filter maske;
-	if(maske.filterAnwenden(urDaten, ArbeitsBild.GetWidth(), ArbeitsBild.GetHeight(), nB, nH))
+	
+	if(maske->filterAnwenden(urDaten, ArbeitsBild.GetWidth(), ArbeitsBild.GetHeight(), nB, nH))
 	{
 		std::cout<<"SetData ArbeitsBild - b = "<<nB<<" - h = "<<nH<<"\n"<<std::flush;
 		std::cout<<"Resize ArbeitsBildgroesse\n"<<std::flush;
 		ArbeitsBild.Resize(wxSize(nB, nH), wxPoint(0, 0));
 	}
+	std::cout<<"delete maske;..."<<std::endl;
+	delete maske;
+	std::cout<<"delete maske; erfolgreich"<<std::endl;
 	Refresh();
 	return;
 }

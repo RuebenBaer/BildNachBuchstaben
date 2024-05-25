@@ -1,6 +1,6 @@
 #include "FilterDialog.h"
 
-FilterDialog::FilterDialog(int filterGroesse,
+FilterDialog::FilterDialog(filter *fltr,
 				wxWindow *parent,
 				wxWindowID id,
 				const wxString &title,
@@ -10,14 +10,18 @@ FilterDialog::FilterDialog(int filterGroesse,
 				const wxString &name)
 				:wxDialog(parent, id, title, pos, size, style, name)
 {
-	if((filterGroesse % 2 == 0)||(filterGroesse == 1))
+	std::cout<<"Dialog Konstuktor\n"<<std::flush;
+	//maske = fltr;
+	
+	if((maske->maskenGroesse % 2 == 0)||(maske->maskenGroesse == 1))
 	{
 		SetReturnCode(wxCANCEL);
 		wxMessageDialog(this, wxT("Die Filtergröße muss ungerade sein."), wxT("Fehler bei Filtergröße")).ShowModal();
 		QueueEvent(new wxCloseEvent(wxEVT_CLOSE_WINDOW));
 	}
-	
-	DialogErneuern(filterGroesse);
+	std::cout<<"Dialog erneuern..."<<std::flush;
+	DialogErneuern();
+	std::cout<<"erfolgreich"<<std::endl;
 	
 	Bind(wxEVT_CLOSE_WINDOW, &FilterDialog::OnQuit, this);
 	Bind(wxEVT_BUTTON, &FilterDialog::NeuerFilter, this, BTN_ID_NEU);
@@ -31,6 +35,7 @@ FilterDialog::~FilterDialog()
 	{
 		wxTextCtrl* txtctrl = TextCtrlContainer.back();
 		TextCtrlContainer.pop_back();
+		std::cout<<txtctrl<<" zerstoeren"<<std::endl;
 		txtctrl->Destroy();
 	};
 	std::cout<<"FilterDialog verlassen...\n";
@@ -38,7 +43,7 @@ FilterDialog::~FilterDialog()
 
 void FilterDialog::NeuerFilter(wxCommandEvent &event)
 {
-	DialogErneuern(3);
+	DialogErneuern();
 	Layout();
 	Refresh();
 	return;
@@ -50,13 +55,18 @@ void FilterDialog::FilterAnwenden(wxCommandEvent &event)
 	return;
 }
 
-void FilterDialog::DialogErneuern(int filterGroesse)
+void FilterDialog::DialogErneuern()
 {
 	while(!TextCtrlContainer.empty())
 	{
 		wxTextCtrl* txtctrl = TextCtrlContainer.back();
 		TextCtrlContainer.pop_back();
-		txtctrl->Destroy();
+		try{
+			txtctrl->Destroy();
+		}
+		catch(...){
+			std::cout<<"txtctrl->Destroy(); fehlgeschlagen"<<std::endl;
+		}
 	};
 
 	if(this->GetSizer() != NULL)
@@ -69,17 +79,38 @@ void FilterDialog::DialogErneuern(int filterGroesse)
 	filterSizer = new wxBoxSizer(wxVERTICAL);
 	hauptSizer = new wxBoxSizer(wxVERTICAL);
 
-	wxNumericPropertyValidator numVal(wxNumericPropertyValidator::Signed);
-	
-	for(int i=0; i< filterGroesse; i++)
+	wxNumericPropertyValidator numVal(wxNumericPropertyValidator::Float);
+
+	/*for(int i=0; i < maske->maskenGroesse; i++)
 	{
 		wxBoxSizer* hSizer = new wxBoxSizer(wxHORIZONTAL);
-		for(int k=0; k< filterGroesse; k++)
+		for(int k=0; k < maske->maskenGroesse; k++)
 		{
-			wxTextCtrl* txtctrl = new wxTextCtrl(this, 10000+(i*filterGroesse+k), wxString::Format("%d", i*filterGroesse+k), wxPoint(0, 0), wxSize(25, 25), wxTE_CENTRE, numVal);
-			hSizer->Add(txtctrl, wxFIXED_MINSIZE|wxEXPAND);
-			
-			TextCtrlContainer.push_back(txtctrl);
+			wxTextCtrl* txtctrl = new wxTextCtrl(this, 10000+(i+k*maske->maskenGroesse),
+												wxString::Format("%.0f", (maske->filterMaske[i+k*maske->maskenGroesse])),
+												wxPoint(0, 0), wxSize(30, 30), wxTE_CENTRE, numVal);
+			if(txtctrl != NULL)
+			{
+				hSizer->Add(txtctrl, wxFIXED_MINSIZE|wxEXPAND);
+				TextCtrlContainer.push_back(txtctrl);
+			}
+		}
+		filterSizer->Add(hSizer);
+	}*/
+
+	for(int i=0; i < 3; i++)
+	{
+		wxBoxSizer* hSizer = new wxBoxSizer(wxHORIZONTAL);
+		for(int k=0; k < 3; k++)
+		{
+			wxTextCtrl* txtctrl = new wxTextCtrl(this, 10000+(i+k*3),
+												wxString::Format("%.0f", (i+k*3)),
+												wxPoint(0, 0), wxSize(30, 30), wxTE_CENTRE, numVal);
+			if(txtctrl != NULL)
+			{
+				hSizer->Add(txtctrl, wxFIXED_MINSIZE|wxEXPAND);
+				TextCtrlContainer.push_back(txtctrl);
+			}
 		}
 		filterSizer->Add(hSizer);
 	}
@@ -87,6 +118,7 @@ void FilterDialog::DialogErneuern(int filterGroesse)
 	hauptSizer->Add(filterSizer);
 	hauptSizer->Add(new wxButton(this, wxID_OK, "OK"));
 	hauptSizer->Add(new wxButton(this, BTN_ID_NEU, "Neuer Filter"));
+	std::cout<<"SetSizer(hauptSizer);"<<std::endl;
 	SetSizer(hauptSizer);
 	return;
 }
