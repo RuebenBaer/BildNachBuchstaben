@@ -1,6 +1,6 @@
 #include "FilterDialog.h"
 
-FilterDialog::FilterDialog(filter *fltr,
+FilterDialog::FilterDialog(int fltGr,
 				wxWindow *parent,
 				wxWindowID id,
 				const wxString &title,
@@ -8,24 +8,22 @@ FilterDialog::FilterDialog(filter *fltr,
 				const wxSize &size,
 				long style,
 				const wxString &name)
-				:wxDialog(parent, id, title, pos, size, style, name)
+				:wxFrame(parent, id, title, pos, size, style, name)
 {
-	std::cout<<"Dialog Konstuktor\n"<<std::flush;
-	//maske = fltr;
+	filterGroesse = fltGr;
 	
-	if((maske->maskenGroesse % 2 == 0)||(maske->maskenGroesse == 1))
+	if((filterGroesse % 2 == 0)||(filterGroesse == 1))
 	{
-		SetReturnCode(wxCANCEL);
 		wxMessageDialog(this, wxT("Die Filtergröße muss ungerade sein."), wxT("Fehler bei Filtergröße")).ShowModal();
 		QueueEvent(new wxCloseEvent(wxEVT_CLOSE_WINDOW));
 	}
-	std::cout<<"Dialog erneuern..."<<std::flush;
+	
 	DialogErneuern();
-	std::cout<<"erfolgreich"<<std::endl;
 	
 	Bind(wxEVT_CLOSE_WINDOW, &FilterDialog::OnQuit, this);
 	Bind(wxEVT_BUTTON, &FilterDialog::NeuerFilter, this, BTN_ID_NEU);
-	Bind(wxEVT_BUTTON, &FilterDialog::FilterAnwenden, this, wxID_OK);
+	Bind(wxEVT_BUTTON, &FilterDialog::FilterAnwenden, this, BTN_ID_ANWENDEN);
+	Bind(wxEVT_BUTTON, &FilterDialog::OnOK, this, wxID_OK);
 }
 
 FilterDialog::~FilterDialog()
@@ -55,6 +53,12 @@ void FilterDialog::FilterAnwenden(wxCommandEvent &event)
 	return;
 }
 
+void FilterDialog::OnOK(wxCommandEvent &event)
+{
+	Show(false);
+	return;
+}
+
 void FilterDialog::DialogErneuern()
 {
 	while(!TextCtrlContainer.empty())
@@ -81,30 +85,13 @@ void FilterDialog::DialogErneuern()
 
 	wxNumericPropertyValidator numVal(wxNumericPropertyValidator::Float);
 
-	/*for(int i=0; i < maske->maskenGroesse; i++)
+	for(int i=0; i < filterGroesse; i++)
 	{
 		wxBoxSizer* hSizer = new wxBoxSizer(wxHORIZONTAL);
-		for(int k=0; k < maske->maskenGroesse; k++)
+		for(int k=0; k < filterGroesse; k++)
 		{
-			wxTextCtrl* txtctrl = new wxTextCtrl(this, 10000+(i+k*maske->maskenGroesse),
-												wxString::Format("%.0f", (maske->filterMaske[i+k*maske->maskenGroesse])),
-												wxPoint(0, 0), wxSize(30, 30), wxTE_CENTRE, numVal);
-			if(txtctrl != NULL)
-			{
-				hSizer->Add(txtctrl, wxFIXED_MINSIZE|wxEXPAND);
-				TextCtrlContainer.push_back(txtctrl);
-			}
-		}
-		filterSizer->Add(hSizer);
-	}*/
-
-	for(int i=0; i < 3; i++)
-	{
-		wxBoxSizer* hSizer = new wxBoxSizer(wxHORIZONTAL);
-		for(int k=0; k < 3; k++)
-		{
-			wxTextCtrl* txtctrl = new wxTextCtrl(this, 10000+(i+k*3),
-												wxString::Format("%.0f", (i+k*3)),
+			wxTextCtrl* txtctrl = new wxTextCtrl(this, 10000+(i+k*filterGroesse),
+												wxString::Format("%.0f", (float)(i+k*3)),
 												wxPoint(0, 0), wxSize(30, 30), wxTE_CENTRE, numVal);
 			if(txtctrl != NULL)
 			{
@@ -116,9 +103,12 @@ void FilterDialog::DialogErneuern()
 	}
 
 	hauptSizer->Add(filterSizer);
-	hauptSizer->Add(new wxButton(this, wxID_OK, "OK"));
-	hauptSizer->Add(new wxButton(this, BTN_ID_NEU, "Neuer Filter"));
-	std::cout<<"SetSizer(hauptSizer);"<<std::endl;
+	
+	wxBoxSizer *buttonSizer = new wxBoxSizer(wxHORIZONTAL);
+	buttonSizer->Add(new wxButton(this, wxID_OK, "OK"));
+	buttonSizer->Add(new wxButton(this, BTN_ID_NEU, "Neuer Filter"));
+	hauptSizer->Add(buttonSizer);
+	
 	SetSizer(hauptSizer);
 	return;
 }
@@ -127,6 +117,14 @@ void FilterDialog::SetzeFilterGroesse(int groesse)
 {
 	wxMessageDialog(this, wxString::Format("Setzt die Filtergröße auf den Wert %d", groesse), "Filtergröße").ShowModal();
 	return;
+}
+
+bool FilterDialog::MatrizeFuellen(filter *maske)
+{
+	if(maske == NULL)return false;
+	if(maske->HoleGroesse() != filterGroesse)return false;
+	
+	return true;
 }
 	
 void FilterDialog::OnQuit(wxCloseEvent &event)

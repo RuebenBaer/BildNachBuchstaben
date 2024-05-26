@@ -2,17 +2,27 @@
 #define __FILTER_H_
 
 #include <iostream>
+#include <fstream>
+#include <cstddef>
+#include <cmath>
 
 class filter{
 private:
 	float threshold = 10.0;
+	int maskenGroesse;
+	float *filterMaske;
 public:
 	filter(int gr);
 	~filter();
-	float *filterMaske;
-	int maskenGroesse;
-	bool filterAnwenden(unsigned char* urBild, int urBildBreite, int urBildHoehe, int& neuBreite, int& neuHoehe);
-	void setzeGroesse(int gr);
+	bool FilterAnwenden(unsigned char* urBild, int urBildBreite, int urBildHoehe, int& neuBreite, int& neuHoehe);
+
+	bool SetzeGroesse(int gr);
+	int HoleGroesse(void) const {return maskenGroesse;};
+	float HoleInhalt(int, int) const;
+	
+	bool Einlesen(void);
+	bool Speichern(void);
+	void StandardFilter(void);
 };
 
 #endif //__FILTER_H_

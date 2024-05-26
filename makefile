@@ -1,6 +1,7 @@
 CXX = g++
 CPPFLAGS =  \
 	-Wall \
+	-Werror \
 	-pipe \
 	-mthreads \
 	-O2 \

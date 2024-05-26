@@ -16,6 +16,7 @@ class MainFrame: public wxFrame
 {
 public:
 	MainFrame(const wxString &title, const wxPoint &pos, const wxSize &size);
+	~MainFrame();
 	void OnQuit(wxCommandEvent &event);
 	void OnOpenBild(wxCommandEvent &event);
 	void OnPaint(wxPaintEvent &event);
@@ -24,7 +25,11 @@ public:
 	void OnBildInBuchstabe(wxCommandEvent& event);
 	void OnBildMaske(wxCommandEvent& event);
 private:
+	void FilterDialogErneuern(void);
+	
 	wxFileDialog *PictureOpener;
+	FilterDialog *FltDlg = NULL;
+	filter *maske = NULL;
 	wxImage WandelBild, BildMaske;
 	wxImage AnzeigeBild, ArbeitsBild;
 	double dFarbFaktor;

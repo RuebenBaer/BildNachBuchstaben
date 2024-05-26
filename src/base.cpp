@@ -43,6 +43,9 @@ MainFrame::MainFrame(const wxString &title, const wxPoint &pos, const wxSize &si
 	BildMaske.LoadFile("./img/Buchstaben.tiff", wxBITMAP_TYPE_TIFF);
 
 	dFarbFaktor = 0.5;
+
+	maske = new filter(3);
+	FilterDialogErneuern();
 	
     CreateStatusBar(2);
     SetStatusText(_("Hello World!"));
@@ -54,6 +57,13 @@ MainFrame::MainFrame(const wxString &title, const wxPoint &pos, const wxSize &si
 	Bind(wxEVT_MENU, &MainFrame::OnFarbFaktor, this, idMenuFarbFaktor);
 	Bind(wxEVT_MENU, &MainFrame::OnBildInBuchstabe, this, idMenuBildInBuchstabe);
 	Bind(wxEVT_MENU, & MainFrame::OnBildMaske, this, idMenuBildMaskieren);
+}
+
+MainFrame::~MainFrame()
+{
+	if(maske)delete maske;
+	if(FltDlg)FltDlg->Destroy();
+	std::cout<<"Alles kaputt gemacht\n";
 }
 
 void MainFrame::OnQuit(wxCommandEvent & WXUNUSED(event))
@@ -135,35 +145,26 @@ void MainFrame::OnPaint(wxPaintEvent &event)
 
 void MainFrame::OnBildMaske(wxCommandEvent& event)
 {
-	filter *maske = new filter(3);
 	if(maske == NULL)
 	{
 		std::cout<<"Maske erstellen fehlgeschlagen\n";
 		return;
 	}
-	for(int i = 0; i < 3; i++)
-		for(int k = 0; k < 3; k++)
-		{
-			maske->filterMaske[i + k * 3] = ((i+1)*10+(k+1));
-		}
 	std::cout<<"Maske:\n";
-	for(int i = 0; i < 3; i++)
+	int mgr = maske->HoleGroesse();
+	for(int i = 0; i < mgr; i++)
 	{
-		for(int k = 0; k < 3; k++)
+		for(int k = 0; k < mgr; k++)
 		{
-			std::cout<<"\t"<<maske->filterMaske[i + k * 3];
+			std::cout<<"\t"<<maske->HoleInhalt(i, k);
 		}
 		std::cout<<"\n";
 	}
-	FilterDialog *fltdlg = new FilterDialog(NULL, this, wxID_ANY, "Bildfilter");
-	fltdlg->ShowModal();
-	delete fltdlg;
+	if(FltDlg) FltDlg->Show();
+	
 	if(!WandelBild.Ok())
 	{
 		std::cout<<"Kein Bild geladen\n"<<std::flush;
-		std::cout<<"delete maske;..."<<std::endl;
-		delete maske;
-		std::cout<<"delete maske; erfolgreich"<<std::endl;
 		return;
 	}
 	int nB, nH;
@@ -172,15 +173,28 @@ void MainFrame::OnBildMaske(wxCommandEvent& event)
 	unsigned char *urDaten = ArbeitsBild.GetData();
 	
 	
-	if(maske->filterAnwenden(urDaten, ArbeitsBild.GetWidth(), ArbeitsBild.GetHeight(), nB, nH))
+	if(maske->FilterAnwenden(urDaten, ArbeitsBild.GetWidth(), ArbeitsBild.GetHeight(), nB, nH))
 	{
 		std::cout<<"SetData ArbeitsBild - b = "<<nB<<" - h = "<<nH<<"\n"<<std::flush;
 		std::cout<<"Resize ArbeitsBildgroesse\n"<<std::flush;
 		ArbeitsBild.Resize(wxSize(nB, nH), wxPoint(0, 0));
 	}
-	std::cout<<"delete maske;..."<<std::endl;
-	delete maske;
-	std::cout<<"delete maske; erfolgreich"<<std::endl;
 	Refresh();
+	return;
+}
+
+void MainFrame::FilterDialogErneuern(void)
+{
+	if(maske == NULL) return;
+	if(FltDlg != NULL)
+	{
+		FltDlg->Destroy();
+		FltDlg = NULL;
+	}
+	
+	FltDlg = new FilterDialog(maske->HoleGroesse(), this, wxID_ANY,
+							wxString::Format("%dx%d-Maske", maske->HoleGroesse(), maske->HoleGroesse()));
+	
+	if(FltDlg != NULL) FltDlg->MatrizeFuellen(maske);
 	return;
 }
