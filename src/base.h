@@ -24,6 +24,8 @@ public:
 	
 	void OnBildInBuchstabe(wxCommandEvent& event);
 	void OnBildMaske(wxCommandEvent& event);
+	
+	void FilterAnwenden(void);
 private:
 	void FilterDialogErneuern(void);
 	

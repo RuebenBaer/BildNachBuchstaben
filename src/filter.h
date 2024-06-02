@@ -11,6 +11,8 @@ private:
 	float threshold = 10.0;
 	int maskenGroesse;
 	float *filterMaske;
+	void StandardFilter(void);
+	bool Einlesen(void);
 public:
 	filter(int gr);
 	~filter();
@@ -19,10 +21,11 @@ public:
 	bool SetzeGroesse(int gr);
 	int HoleGroesse(void) const {return maskenGroesse;};
 	float HoleInhalt(int, int) const;
+	void SetzeInhalt(int, int, float);
+	float HoleThreshold(void) const;
+	void SetzeThreshold(float);
 	
-	bool Einlesen(void);
 	bool Speichern(void);
-	void StandardFilter(void);
 };
 
 #endif //__FILTER_H_

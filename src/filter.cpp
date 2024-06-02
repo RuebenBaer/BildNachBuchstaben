@@ -88,6 +88,28 @@ float filter::HoleInhalt(int a, int b) const
 	return filterMaske[a + b * maskenGroesse];
 }
 
+void filter::SetzeInhalt(int a, int b, float wert)
+{
+	if(!(a < maskenGroesse))return;
+	if(!(b < maskenGroesse))return;
+	if(!filterMaske)return;
+	
+	filterMaske[a + b * maskenGroesse] = wert;
+	
+	return;
+}
+
+float filter::HoleThreshold(void) const
+{
+	return threshold;
+}
+
+void filter::SetzeThreshold(float th)
+{
+	threshold = th;
+	return;
+}
+
 bool filter::Einlesen(void)
 {
 	if(!filterMaske)return false;
@@ -115,6 +137,7 @@ bool filter::Einlesen(void)
 			datei.read((char*)&(filterMaske[i + k * dimension]), sizeof(float));
 		}
 	}
+	datei.read((char*)&threshold, sizeof(float));
 	datei.close();
 	return true;
 }
@@ -135,6 +158,7 @@ bool filter::Speichern(void)
 			output.write((char*)&(filterMaske[i + k * maskenGroesse]), sizeof(float));
 		}
 	}
+	output.write((char*)&threshold, sizeof(float));
 	output.close();
 	return true;
 }
@@ -153,6 +177,8 @@ void filter::StandardFilter(void)
 	filterMaske[6] = 0;
 	filterMaske[7] = 4;
 	filterMaske[8] = 0;
+	
+	threshold = 10.0;
 	
 	Speichern();
 	return;

@@ -10,10 +10,12 @@
 #include <vector>
 #include "filter.h"
 
+class MainFrame;
+
 class FilterDialog : public wxFrame
 {
 public:
-	FilterDialog(int fltGr,
+	FilterDialog(filter *maske,
 				wxWindow *parent,
 				wxWindowID id,
 				const wxString &title,
@@ -22,19 +24,20 @@ public:
 				long style=(wxDEFAULT_FRAME_STYLE & ~(wxRESIZE_BORDER | wxMAXIMIZE_BOX | wxCLOSE_BOX)),
 				const wxString &name=wxFrameNameStr);
 	~FilterDialog();
-	bool MatrizeFuellen(filter *maske);
 private:
 	void DialogErneuern();
-	void SetzeFilterGroesse(int groesse);
 	void NeuerFilter(wxCommandEvent &event);
 	void FilterAnwenden(wxCommandEvent &event);
 	void OnQuit(wxCloseEvent &event);
 	void OnOK(wxCommandEvent &event);
+	void OnThreshold(wxCommandEvent &event);
+	
+	bool MatrizeFuellen();
 
 	
-	wxTextCtrl *filterGroesseCaption, *filterGroesseTextCtrl;
+	wxTextCtrl *filterTHCaption, *filterTHTextCtrl;
 	
-	int filterGroesse;
+	filter *m_maske;
 	
 	std::vector<wxTextCtrl*> TextCtrlContainer;
 	wxBoxSizer *filterSizer = NULL;
@@ -44,7 +47,9 @@ private:
 enum
 {
 	MENU_ID_QUIT = wxID_HIGHEST+1,
-	BTN_ID_NEU, BTN_ID_ANWENDEN
+	BTN_ID_NEU, BTN_ID_ANWENDEN, BTN_ID_THRESHOLD
 };
+
+#include "base.h"
 
 #endif //__FILTERDIALOG_H_

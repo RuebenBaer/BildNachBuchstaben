@@ -1,7 +1,7 @@
 #include "FilterDialog.h"
 
-FilterDialog::FilterDialog(int fltGr,
-				wxWindow *parent,
+FilterDialog::FilterDialog(filter *maske,
+				wxWindow* parent,
 				wxWindowID id,
 				const wxString &title,
 				const wxPoint &pos,
@@ -10,20 +10,20 @@ FilterDialog::FilterDialog(int fltGr,
 				const wxString &name)
 				:wxFrame(parent, id, title, pos, size, style, name)
 {
-	filterGroesse = fltGr;
+	m_maske = maske;
 	
-	if((filterGroesse % 2 == 0)||(filterGroesse == 1))
+	if((m_maske->HoleGroesse() % 2 == 0)||(m_maske->HoleGroesse() == 1))
 	{
 		wxMessageDialog(this, wxT("Die Filtergröße muss ungerade sein."), wxT("Fehler bei Filtergröße")).ShowModal();
-		QueueEvent(new wxCloseEvent(wxEVT_CLOSE_WINDOW));
+	}else{
+		DialogErneuern();
 	}
-	
-	DialogErneuern();
 	
 	Bind(wxEVT_CLOSE_WINDOW, &FilterDialog::OnQuit, this);
 	Bind(wxEVT_BUTTON, &FilterDialog::NeuerFilter, this, BTN_ID_NEU);
 	Bind(wxEVT_BUTTON, &FilterDialog::FilterAnwenden, this, BTN_ID_ANWENDEN);
 	Bind(wxEVT_BUTTON, &FilterDialog::OnOK, this, wxID_OK);
+	Bind(wxEVT_TEXT_ENTER, &FilterDialog::FilterAnwenden, this, BTN_ID_THRESHOLD);
 }
 
 FilterDialog::~FilterDialog()
@@ -49,7 +49,22 @@ void FilterDialog::NeuerFilter(wxCommandEvent &event)
 
 void FilterDialog::FilterAnwenden(wxCommandEvent &event)
 {
-	wxMessageDialog(this, wxString::Format("Filter wird angewendet"), "Filter anwenden").ShowModal();
+	//wxMessageDialog(this, wxString::Format("Filter wird angewendet"), "Filter anwenden").ShowModal();
+	for(int i = 0; i < m_maske->HoleGroesse(); i++)
+	{
+		for(int k = 0; k < m_maske->HoleGroesse(); k++)
+		{
+			double wert;
+			if(!TextCtrlContainer[i + k * m_maske->HoleGroesse()]->GetValue().ToDouble(&wert)) wert = 0;
+			m_maske->SetzeInhalt(i, k, (float)wert);
+		}
+	}
+	double wert;
+	if(!filterTHTextCtrl->GetValue().ToDouble(&wert))wert = 0;
+	m_maske->SetzeThreshold((float)wert);
+	m_maske->Speichern();
+	
+	GetParent()->GetEventHandler()->QueueEvent(new wxCommandEvent(wxEVT_MENU, idMenuBildMaskieren));
 	return;
 }
 
@@ -72,6 +87,7 @@ void FilterDialog::DialogErneuern()
 			std::cout<<"txtctrl->Destroy(); fehlgeschlagen"<<std::endl;
 		}
 	};
+	DestroyChildren();
 
 	if(this->GetSizer() != NULL)
 	{
@@ -85,12 +101,12 @@ void FilterDialog::DialogErneuern()
 
 	wxNumericPropertyValidator numVal(wxNumericPropertyValidator::Float);
 
-	for(int i=0; i < filterGroesse; i++)
+	for(int i=0; i < m_maske->HoleGroesse(); i++)
 	{
 		wxBoxSizer* hSizer = new wxBoxSizer(wxHORIZONTAL);
-		for(int k=0; k < filterGroesse; k++)
+		for(int k=0; k < m_maske->HoleGroesse(); k++)
 		{
-			wxTextCtrl* txtctrl = new wxTextCtrl(this, 10000+(i+k*filterGroesse),
+			wxTextCtrl* txtctrl = new wxTextCtrl(this, 10000+(i+k*m_maske->HoleGroesse()),
 												wxString::Format("%.0f", (float)(i+k*3)),
 												wxPoint(0, 0), wxSize(30, 30), wxTE_CENTRE, numVal);
 			if(txtctrl != NULL)
@@ -106,24 +122,38 @@ void FilterDialog::DialogErneuern()
 	
 	wxBoxSizer *buttonSizer = new wxBoxSizer(wxHORIZONTAL);
 	buttonSizer->Add(new wxButton(this, wxID_OK, "OK"));
+	buttonSizer->Add(new wxButton(this, BTN_ID_ANWENDEN, "Filter anwenden"));
 	buttonSizer->Add(new wxButton(this, BTN_ID_NEU, "Neuer Filter"));
 	hauptSizer->Add(buttonSizer);
 	
-	SetSizer(hauptSizer);
-	return;
-}
-
-void FilterDialog::SetzeFilterGroesse(int groesse)
-{
-	wxMessageDialog(this, wxString::Format("Setzt die Filtergröße auf den Wert %d", groesse), "Filtergröße").ShowModal();
-	return;
-}
-
-bool FilterDialog::MatrizeFuellen(filter *maske)
-{
-	if(maske == NULL)return false;
-	if(maske->HoleGroesse() != filterGroesse)return false;
+	wxBoxSizer *thresholdSizer = new wxBoxSizer(wxHORIZONTAL);
+	thresholdSizer->Add(new wxTextCtrl(this, BTN_ID_THRESHOLD, "Threshold setzen",
+										wxPoint(0, 0), wxDefaultSize, wxTE_RIGHT|wxTE_READONLY), wxEXPAND);
+	filterTHTextCtrl = new wxTextCtrl(this, BTN_ID_THRESHOLD, "", wxPoint(0, 0),
+										wxDefaultSize, wxTE_RIGHT|wxTE_PROCESS_ENTER, numVal);
+	thresholdSizer->Add(filterTHTextCtrl, wxEXPAND);
+	hauptSizer->Add(thresholdSizer);
 	
+	SetSizer(hauptSizer);
+	
+	MatrizeFuellen();
+	return;
+}
+
+bool FilterDialog::MatrizeFuellen()
+{
+	if(m_maske == NULL)return false;
+	
+	for(int i = 0; i < m_maske->HoleGroesse(); i++)
+	{
+		for(int k = 0; k < m_maske->HoleGroesse(); k++)
+		{
+			TextCtrlContainer[i + k * m_maske->HoleGroesse()]->SetValue(wxString::Format("%.1f", m_maske->HoleInhalt(i, k)));
+		}
+	}
+	
+	filterTHTextCtrl->SetValue(wxString::Format("%0.1f", m_maske->HoleThreshold()));
+
 	return true;
 }
 	

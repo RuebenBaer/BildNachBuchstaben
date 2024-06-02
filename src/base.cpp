@@ -152,15 +152,19 @@ void MainFrame::OnBildMaske(wxCommandEvent& event)
 	}
 	std::cout<<"Maske:\n";
 	int mgr = maske->HoleGroesse();
-	for(int i = 0; i < mgr; i++)
+	for(int k = 0; k < mgr; k++)
 	{
-		for(int k = 0; k < mgr; k++)
+		for(int i = 0; i < mgr; i++)
 		{
 			std::cout<<"\t"<<maske->HoleInhalt(i, k);
 		}
 		std::cout<<"\n";
+		std::cout<<"Threshold: "<<maske->HoleThreshold()<<"\n";
 	}
-	if(FltDlg) FltDlg->Show();
+	if(FltDlg)
+	{
+		FltDlg->Show();
+	}
 	
 	if(!WandelBild.Ok())
 	{
@@ -192,9 +196,13 @@ void MainFrame::FilterDialogErneuern(void)
 		FltDlg = NULL;
 	}
 	
-	FltDlg = new FilterDialog(maske->HoleGroesse(), this, wxID_ANY,
+	FltDlg = new FilterDialog(maske, this, wxID_ANY,
 							wxString::Format("%dx%d-Maske", maske->HoleGroesse(), maske->HoleGroesse()));
-	
-	if(FltDlg != NULL) FltDlg->MatrizeFuellen(maske);
+	return;
+}
+
+void MainFrame::FilterAnwenden()
+{
+	QueueEvent(new wxCommandEvent(wxEVT_MENU, idMenuBildMaskieren));
 	return;
 }
