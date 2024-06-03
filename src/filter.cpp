@@ -37,19 +37,20 @@ bool filter::FilterAnwenden(unsigned char* urBild, int urBildBreite, int urBildH
 		}
 	
 	float wert;
+	int halbeMaske = maskenGroesse / 2;
 	for(int x = 0; x < neuBreite; x++)
 	{
 		for(int y = 0; y < neuHoehe; y++)
 		{
 			wert = 0;
-			for(int mx = -(maskenGroesse-1)/2; mx < (maskenGroesse-1)/2 + 1; mx++)
+			for(int mx = -halbeMaske; mx < halbeMaske + 1; mx++)
 			{
-				for(int my = -(maskenGroesse-1)/2; my < (maskenGroesse-1)/2 + 1; my++)
+				for(int my = -halbeMaske; my < halbeMaske + 1; my++)
 				{
 					wert += (neuBild[(x + 1 + mx + (y + 1 + my) * urBildBreite) *3 + 0] +
 							neuBild[(x + 1 + mx + (y + 1 + my) * urBildBreite) *3 + 1] +
 							neuBild[(x + 1 + mx + (y + 1 + my) * urBildBreite) *3 + 2]) * 
-							filterMaske[(mx+maskenGroesse-1)+(my+maskenGroesse-1)*maskenGroesse] / 3;
+							filterMaske[(mx+halbeMaske)+(my+halbeMaske)*maskenGroesse] / 3;
 				}
 			}
 			
