@@ -9,12 +9,15 @@
 class filter{
 private:
 	float threshold = 10.0;
+	float maskenMittel;
 	int maskenGroesse;
 	float *filterMaske;
 	void StandardFilter(void);
 	bool Einlesen(void);
+	
+	void MaskeMitteln(void);
 public:
-	filter(int gr);
+	filter();
 	~filter();
 	bool FilterAnwenden(unsigned char* urBild, int urBildBreite, int urBildHoehe, int& neuBreite, int& neuHoehe);
 
@@ -24,6 +27,7 @@ public:
 	void SetzeInhalt(int, int, float);
 	float HoleThreshold(void) const;
 	void SetzeThreshold(float);
+	
 	
 	bool Speichern(void);
 };

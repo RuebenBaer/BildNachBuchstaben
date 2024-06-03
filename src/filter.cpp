@@ -1,22 +1,20 @@
 #include "filter.h"
 
-filter::filter(int gr)
+filter::filter()
 {
-	if((gr%2 != 0) && !(gr < 2))
-	{
-		filterMaske = new float[gr*gr];
-		maskenGroesse = gr;
-	}
+	filterMaske = NULL;
 	if(!Einlesen())
 	{
 		std::cout<<"StandardFilter wird erzeugt\n";
 		StandardFilter();
 	}
+	MaskeMitteln();
+	std::cout<<"filter const verlassen\n";
 }
 
 filter::~filter()
 {
-	std::cout<<"filterMaske loeschen"<<std::endl;
+	std::cout<<"filter destr: filterMaske loeschen"<<std::endl;
 	if(filterMaske)delete [] filterMaske;
 }
 
@@ -54,7 +52,13 @@ bool filter::FilterAnwenden(unsigned char* urBild, int urBildBreite, int urBildH
 				}
 			}
 			
-			wert = 255 * (wert < threshold);
+			if(maskenMittel)
+			{
+				wert /= maskenMittel;
+			}else
+			{
+				wert = 255 * (wert < threshold);
+			}
 			urBild[(x + y * urBildBreite) * 3 + 0] = wert;
 			urBild[(x + y * urBildBreite) * 3 + 1] = wert;
 			urBild[(x + y * urBildBreite) * 3 + 2] = wert;
@@ -75,7 +79,11 @@ bool filter::SetzeGroesse(int gr)
 			filterMaske = NULL;
 		}
 		filterMaske = new float[gr*gr];
-		if(filterMaske) return true;
+		if(filterMaske)
+		{
+			MaskeMitteln();
+			return true;
+		}
 	}
 	return false;
 }
@@ -96,6 +104,8 @@ void filter::SetzeInhalt(int a, int b, float wert)
 	if(!filterMaske)return;
 	
 	filterMaske[a + b * maskenGroesse] = wert;
+	
+	MaskeMitteln();
 	
 	return;
 }
@@ -140,6 +150,7 @@ bool filter::Einlesen(void)
 	}
 	datei.read((char*)&threshold, sizeof(float));
 	datei.close();
+	MaskeMitteln();
 	return true;
 }
 
@@ -170,17 +181,30 @@ void filter::StandardFilter(void)
 	filterMaske[0] = 0;
 	filterMaske[1] = 4;
 	filterMaske[2] = 0;
-	
+
 	filterMaske[3] = 4;
 	filterMaske[4] = -20;
 	filterMaske[5] = 4;
-	
+
 	filterMaske[6] = 0;
 	filterMaske[7] = 4;
 	filterMaske[8] = 0;
-	
+
 	threshold = 10.0;
-	
+
+	MaskeMitteln();
 	Speichern();
+	return;
+}
+
+void filter::MaskeMitteln(void)
+{
+	maskenMittel = 0;
+	for(int i = 0; i < maskenGroesse; i++)
+		for(int k = 0; k < maskenGroesse; k++)
+		{
+			maskenMittel += filterMaske[i + k * maskenGroesse];
+		}
+	std::cout<<"maskenMittel: "<<maskenMittel<<"\n";
 	return;
 }

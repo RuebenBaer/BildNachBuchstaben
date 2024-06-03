@@ -44,7 +44,7 @@ MainFrame::MainFrame(const wxString &title, const wxPoint &pos, const wxSize &si
 
 	dFarbFaktor = 0.5;
 
-	maske = new filter(3);
+	maske = new filter();
 	FilterDialogErneuern();
 	
     CreateStatusBar(2);
@@ -159,8 +159,8 @@ void MainFrame::OnBildMaske(wxCommandEvent& event)
 			std::cout<<"\t"<<maske->HoleInhalt(i, k);
 		}
 		std::cout<<"\n";
-		std::cout<<"Threshold: "<<maske->HoleThreshold()<<"\n";
 	}
+	std::cout<<"Threshold: "<<maske->HoleThreshold()<<"\n";
 	if(FltDlg)
 	{
 		FltDlg->Show();
