@@ -55,6 +55,8 @@ bool filter::FilterAnwenden(unsigned char* urBild, int urBildBreite, int urBildH
 			if(maskenMittel)
 			{
 				wert /= maskenMittel;
+				if (wert > 255) wert = 255;
+				if (wert < 0) wert = 0;
 			}else
 			{
 				wert = 255 * (wert < threshold);
