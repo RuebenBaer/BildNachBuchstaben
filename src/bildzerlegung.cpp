@@ -32,11 +32,19 @@ void BildZerlegen(unsigned char* urBild, int urBildBreite, int urBildHoehe, unsi
 				{
 					for(int y_innen = 0; y_innen < buchstabenHoehe; y_innen++)
 					{
-						int urIndex = ((x_aussen * zeichenBreite + x_innen) + (y_aussen * buchstabenHoehe + y_innen) * urBildBreite) * 3;
-						int bstIndex = ((x_innen + bstbNr * zeichenBreite)  + y_innen * buchstabenBreite) * 3;
+						int urIndex = ((x_aussen * zeichenBreite + x_innen) + 
+								(y_aussen * buchstabenHoehe + y_innen) * urBildBreite) * 3;
+
+						int bstIndex = ((x_innen + bstbNr * zeichenBreite)  + 
+								y_innen * buchstabenBreite) * 3;
 						
-						urX += urBild[urIndex]*0.299f + urBild[urIndex + 1]*0.587f + urBild[urIndex + 2]*0.114f;
-						maskeX += buchstaben[bstIndex]*0.299f + buchstaben[bstIndex + 1]*0.587f + buchstaben[bstIndex + 2]*0.114f;
+						urX += urBild[urIndex]*0.299f + 
+							urBild[urIndex + 1]*0.587f + 
+							urBild[urIndex + 2]*0.114f;
+
+						maskeX += buchstaben[bstIndex]*0.299f + 
+								buchstaben[bstIndex + 1]*0.587f + 
+								buchstaben[bstIndex + 2]*0.114f;
 					}
 				}
 				aktAbstand = abs(urX - maskeX);
@@ -83,18 +91,24 @@ void BildZerlegenNormalverteilung(unsigned char* urBild, int urBildBreite, int u
 	
 	int* einKanalBild = new int[zeichenBreite * buchstabenHoehe];
 	
+	std::cout << "Buchstaben: ";
 	for(int bstbNr = 0; bstbNr < anzBuchstaben; bstbNr++) //bei 1 anfangen um das Leerzeichen auszunehmen
 	{
+		std::cout << (char)(32 + bstbNr);
 		for(int x_innen = 0; x_innen < zeichenBreite; x_innen++)
 		{
 			for(int y_innen = 0; y_innen < buchstabenHoehe; y_innen++)
 			{
 				int bstIndex = ((x_innen + bstbNr * zeichenBreite)  + y_innen * buchstabenBreite) * 3;
-				einKanalBild [x_innen + y_innen * zeichenBreite] = (int)(buchstaben[bstIndex]*0.299f + buchstaben[bstIndex + 1]*0.587f + buchstaben[bstIndex + 2]*0.114f);
+				einKanalBild [x_innen + y_innen * zeichenBreite]
+					= (int)(buchstaben[bstIndex + 0]*0.299f + 
+						buchstaben[bstIndex + 1]*0.587f + 
+						buchstaben[bstIndex + 2]*0.114f);
 			}
 		}
 		BuchstabenParameter[bstbNr] = NormalVerteilung::Analyse(einKanalBild, zeichenBreite, buchstabenHoehe);
 	}
+	std::cout << "\n\n";
 	
 	for(int x_aussen = 0; x_aussen < maxX; x_aussen++)
 	{
@@ -105,15 +119,21 @@ void BildZerlegenNormalverteilung(unsigned char* urBild, int urBildBreite, int u
 			{
 				for(int y_innen = 0; y_innen < buchstabenHoehe; y_innen++)
 				{
-					int urIndex = ((x_aussen * zeichenBreite + x_innen) + (y_aussen * buchstabenHoehe + y_innen) * urBildBreite) * 3;
+					int urIndex = ((x_aussen * zeichenBreite + x_innen) + 
+							(y_aussen * buchstabenHoehe + y_innen) * urBildBreite) * 3;
+
 					
-					einKanalBild [x_innen + y_innen * zeichenBreite] = (int)(urBild[urIndex]*0.299f + urBild[urIndex + 1]*0.587f + urBild[urIndex + 2]*0.114f);
+					einKanalBild [x_innen + y_innen * zeichenBreite] 
+						= (int)(urBild[urIndex + 0]*0.299f + 
+							urBild[urIndex + 1]*0.587f + 
+							urBild[urIndex + 2]*0.114f);
 				}
 			}
 			NormalVerteilung::Parameter parm = NormalVerteilung::Analyse(einKanalBild, zeichenBreite, buchstabenHoehe);
 				
 			GesamtUebereinstimmung = 0;//std::numeric_limits<float>::min();
-			for(int bstbNr = 0; bstbNr < anzBuchstaben; bstbNr++) //bei 1 anfangen um das Leerzeichen auszunehmen
+			Zerlegung[x_aussen + y_aussen * maxX] = 0;
+			for(int bstbNr = 1; bstbNr < anzBuchstaben; bstbNr++) //bei 1 anfangen um das Leerzeichen auszunehmen
 			{
 				aktUebereinstimmung = NormalVerteilung::Uebereinstimmung(parm, BuchstabenParameter[bstbNr]);
 				if(aktUebereinstimmung > GesamtUebereinstimmung)

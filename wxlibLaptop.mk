@@ -1,23 +1,26 @@
 LIBS = \
-	-lwxbase32u \
-	-lwxbase32u_net \
-	-lwxbase32u_xml \
+	-lwxbase33u \
+       	-lwxbase33u_net \
+	-lwxbase33u_xml \
 	-lwxexpat \
 	-lwxjpeg \
-	-lwxmsw32u_adv \
-	-lwxmsw32u_aui \
-	-lwxmsw32u_core \
-	-lwxmsw32u_gl \
-	-lwxmsw32u_html \
-	-lwxmsw32u_media \
-	-lwxmsw32u_propgrid \
-	-lwxmsw32u_ribbon \
-	-lwxmsw32u_richtext \
-	-lwxmsw32u_stc \
-	-lwxmsw32u_webview \
-	-lwxmsw32u_xrc \
+	-lwxlexilla \
+	-lwxmsw33u_adv \
+	-lwxmsw33u_aui \
+	-lwxmsw33u_core \
+	-lwxmsw33u_gl \
+	-lwxmsw33u_html \
+	-lwxmsw33u_media \
+	-lwxmsw33u_propgrid \
+	-lwxmsw33u_ribbon \
+	-lwxmsw33u_richtext \
+	-lwxmsw33u_stc \
+	-lwxmsw33u_webview \
+	-lwxmsw33u_xrc \
 	-lwxpng \
 	-lwxregexu \
 	-lwxscintilla \
 	-lwxtiff \
-	-lwxzlib
+	-lwxwebp \
+	-lwxzlib \
+	-lwxzlib \
